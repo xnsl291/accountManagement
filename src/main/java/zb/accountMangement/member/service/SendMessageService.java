@@ -1,4 +1,4 @@
-package zb.accountMangement.service;
+package zb.accountMangement.member.service;
 
 import static zb.accountMangement.common.type.RedisTime.PHONE_VALID;
 
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import zb.accountMangement.common.util.RedisUtil;
-import zb.accountMangement.dto.SmsVerificationInfo;
+import zb.accountMangement.member.dto.SmsVerificationInfo;
 
 @Service
 @Slf4j

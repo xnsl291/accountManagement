@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
-import zb.accountMangement.dto.SmsVerificationInfo;
+import zb.accountMangement.member.dto.SmsVerificationInfo;
 
 @Service
 @RequiredArgsConstructor

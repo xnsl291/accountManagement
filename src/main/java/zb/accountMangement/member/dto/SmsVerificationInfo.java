@@ -1,4 +1,4 @@
-package zb.accountMangement.dto;
+package zb.accountMangement.member.dto;
 
 import lombok.Getter;
 import lombok.Setter;
