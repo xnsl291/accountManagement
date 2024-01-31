@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SmsVerificationInfo {
+public class SmsVerificationDto {
   private String phoneNumber;
   private String verificationCode;
   private String token;

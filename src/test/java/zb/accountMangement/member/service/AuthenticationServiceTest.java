@@ -1,10 +1,5 @@
 package zb.accountMangement.member.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -29,8 +24,7 @@ class AuthenticationServiceTest {
 
 //    String encodedPassword = "encodedPassword";
 //    when(passwordEncoder.encode(dto.getPassword())).thenReturn(encodedPassword);
-
-    System.out.println(authenticationService.signUp(dto));
+    authenticationService.signUp(dto);
 
 //    verify(memberRepository).save(any(Member.class));
   }
