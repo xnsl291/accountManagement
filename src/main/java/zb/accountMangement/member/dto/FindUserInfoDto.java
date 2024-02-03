@@ -8,5 +8,4 @@ import lombok.Setter;
 public class FindUserInfoDto {
   private String name;
   private String phone;
-  private String token;
 }
