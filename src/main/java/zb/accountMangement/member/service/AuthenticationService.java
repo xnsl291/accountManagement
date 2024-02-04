@@ -3,6 +3,9 @@ package zb.accountMangement.member.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import zb.accountMangement.account.dto.OpenAccountDto;
+import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.exception.DuplicatedInfoException;
 import zb.accountMangement.common.exception.InvalidInputException;
 import zb.accountMangement.common.util.RedisUtil;
@@ -23,12 +26,14 @@ public class AuthenticationService {
   private final MemberRepository memberRepository;
   private final SendMessageService sendMessageService;
   private final BCryptPasswordEncoder passwordEncoder;
+  private final AccountService accountService;
   private final RedisUtil redisUtil;
 
   /**
    * 회원가입
    * @param signUpDto
    */
+  @Transactional
   public void signUp(SignUpDto signUpDto){
 
     // 이름 유효성 검사
@@ -44,6 +49,7 @@ public class AuthenticationService {
 
     // 핸드폰 인증번호 발송
     sendMessageService.sendVerificationMessage(signUpDto.getPhoneNumber());
+    System.out.println("==============================================");
 
     // 저장
     Member member = Member.builder()
@@ -51,6 +57,13 @@ public class AuthenticationService {
         .password(passwordEncoder.encode(signUpDto.getPassword()))
         .phoneNumber(signUpDto.getPhoneNumber())
         .build();
+
+    // 초기 계좌 생성
+    OpenAccountDto openAccountDto = OpenAccountDto.builder()
+            .nickname(null)
+            .password(passwordEncoder.encode(signUpDto.getInitialAccountPassword()))
+            .build();
+    accountService.openAccount(openAccountDto);
 
     memberRepository.save(member);
   }

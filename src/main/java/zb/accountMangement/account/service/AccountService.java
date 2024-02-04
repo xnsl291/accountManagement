@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.dto.OpenAccountDto;
 import zb.accountMangement.account.repository.AccountRepository;
@@ -24,6 +25,7 @@ public class AccountService {
       return RandomStringUtils.random(ACCOUNT_NUMBER_LENGTH, false, true);
   }
 
+  @Transactional
   public Account openAccount(OpenAccountDto openAccountDto) {
 
       // 계좌번호 랜덤생성 - 중복 생성 x

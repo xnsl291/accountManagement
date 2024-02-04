@@ -19,4 +19,7 @@ public class SignUpDto {
   @NotNull
   private String password; //로그인 패스워드
 
+  @NotNull
+  private String initialAccountPassword; //초기 생성되는 계좌 비밀번호
+
 }
