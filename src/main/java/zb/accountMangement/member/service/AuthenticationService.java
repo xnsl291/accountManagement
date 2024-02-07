@@ -8,13 +8,11 @@ import zb.accountMangement.account.dto.OpenAccountDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
-import zb.accountMangement.common.exception.DuplicatedInfoException;
-import zb.accountMangement.common.exception.InvalidInputException;
+import zb.accountMangement.common.exception.*;
 import zb.accountMangement.common.util.RedisUtil;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.common.type.ErrorCode;
-import zb.accountMangement.member.exception.*;
 import zb.accountMangement.member.repository.MemberRepository;
 import zb.accountMangement.member.type.RoleType;
 
@@ -121,10 +119,9 @@ public class AuthenticationService {
   /**
    * 로그인 기능
    * @param signInDto
-   * @return token
+   * @return token - 토큰
    */
-  public String signIn(SignInDto signInDto) {
-
+  public JwtToken signIn(SignInDto signInDto) {
     Member member = memberRepository.findByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()))
             .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
@@ -137,7 +134,29 @@ public class AuthenticationService {
     if(member.getRole().equals(RoleType.PENDING))
       throw new UnauthorizedMemberAccessException(ErrorCode.PENDING_USER);
 
-    return "로그인 완료";  // token
+    String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), member.getPhoneNumber(), member.getRole());
+    String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(),member.getPhoneNumber(), member.getRole());
+
+    jwtTokenProvider.saveRefreshToken(member.getPhoneNumber(), refreshToken);
+    return new JwtToken(accessToken,refreshToken);
+  }
+
+  /**
+   * 로그아웃
+   * @param token - 토큰
+   * return "로그아웃 완료"
+   */
+  public String signOut(String token) {
+
+    if (jwtTokenProvider.validateToken(token)) {
+      String phoneNumber = jwtTokenProvider.getPhoneNumber(token);
+
+      if (redisUtil.getData(phoneNumber) != null) {
+        redisUtil.deleteData(phoneNumber);
+      }
+      jwtTokenProvider.deleteToken(phoneNumber);
+    }
+    return "로그아웃 완료";
   }
 
   /**
@@ -145,7 +164,7 @@ public class AuthenticationService {
    * @param string - 변환하고자 하는 문자열
    * @return 변환된 문자열
    */
-  private String convert2NumericString(String string){
+  public String convert2NumericString(String string){
     String pattern = "[^0-9]";
     return string.replaceAll(pattern,"");
   }

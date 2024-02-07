@@ -2,11 +2,7 @@ package zb.accountMangement.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.service.MemberService;
@@ -23,7 +19,7 @@ public class MemberController {
    * @param userId - id
    * @return Member
    */
-  @PostMapping("/{user_id}")
+  @GetMapping("/{user_id}")
   public ResponseEntity<Member> getUserInfo(@PathVariable("user_id") long userId  ){
     return ResponseEntity.ok().body(memberService.getUserInfo(userId));
   }
@@ -34,7 +30,7 @@ public class MemberController {
    * @param updateUserDto - 수정할 정보
    * @return "수정완료"
    */
-  @PostMapping("/{user_id}")
+  @PatchMapping("/update/{user_id}")
   public ResponseEntity<Member> updateUserInfo(
       @PathVariable("user_id") long userId,
       @RequestBody UpdateUserDto updateUserDto){
@@ -43,12 +39,12 @@ public class MemberController {
 
   /**
    * 회원탈퇴
-   * @param userId
-   * @return userId
+   * @param userId - id
+   * @return "회원탈퇴완료"
    */
-  @PostMapping("/{user_id}")
-  public ResponseEntity<Long> deleteUserInfo(@PathVariable("user_id") long userId){
-    return ResponseEntity.ok().body(memberService.deleteUserInfo(userId));
+  @PatchMapping("/{user_id}")
+  public ResponseEntity<String> deleteUserInfo(@PathVariable("user_id") long userId){
+    return ResponseEntity.ok().body(memberService.deleteUser(userId));
   }
 
 }

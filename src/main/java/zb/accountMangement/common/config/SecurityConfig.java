@@ -5,11 +5,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -23,14 +20,10 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
+    return http
         .cors()
         .and()
         .csrf().disable()
-        .httpBasic().disable()
-        .formLogin().disable()
-        .headers().frameOptions().disable()
-        .and()
         .authorizeRequests()
         .antMatchers("/login",
             "/sign-up",
@@ -38,16 +31,9 @@ public class SecurityConfig {
         .permitAll()
         .antMatchers("/admin/**").hasRole("ADMIN")
         .anyRequest().authenticated()
-//        .and()
-//        .exceptionHandling()
-//        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-//        .and()
-//        .sessionManagement()
-//        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//        .and()
-//        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-;
-    return http.build();
+        .and()
+        .formLogin().disable()
+            .build();
   }
 }
 

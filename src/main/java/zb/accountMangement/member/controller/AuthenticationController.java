@@ -2,15 +2,9 @@ package zb.accountMangement.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import zb.accountMangement.member.dto.FindUserInfoDto;
-import zb.accountMangement.member.dto.ResetPwDto;
-import zb.accountMangement.member.dto.SignUpDto;
-import zb.accountMangement.member.dto.SmsVerificationDto;
+import org.springframework.web.bind.annotation.*;
+import zb.accountMangement.common.auth.JwtToken;
+import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.service.AuthenticationService;
 import zb.accountMangement.member.service.SendMessageService;
 
@@ -20,6 +14,7 @@ import zb.accountMangement.member.service.SendMessageService;
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
   private final SendMessageService sendMessageService;
+
   /**
    * 회원가입
    * @param signUpDto
@@ -47,7 +42,7 @@ public class AuthenticationController {
    * @param findUserInfoDto
    * @return "인증 메세지 발송 완료"
    */
-  @PostMapping("/find-pw/{user_id}")
+  @GetMapping("/find-pw/{user_id}")
   public ResponseEntity<String> requestResetPw(
       @PathVariable("user_id") Long userId,
       @RequestBody FindUserInfoDto findUserInfoDto) {
@@ -60,14 +55,21 @@ public class AuthenticationController {
    * @param resetPwDto
    * @return "비밀번호 재설정 완료"
    */
-  @PostMapping("/find-pw/{user_id}/confirm")
+  @PatchMapping("/find-pw/{user_id}/confirm")
   public ResponseEntity<String> verifyResetPw(
       @PathVariable("user_id") Long userId,
       @RequestBody ResetPwDto resetPwDto) {
 
     return ResponseEntity.ok().body(authenticationService.verifyResetPw(userId,resetPwDto));
-
   }
 
+  @PostMapping("/login")
+  public ResponseEntity<JwtToken> signIn(@RequestBody SignInDto signInDto){
+    return ResponseEntity.ok().body(authenticationService.signIn(signInDto));
+  }
 
+  @PostMapping("/logout/{token}")
+  public ResponseEntity<String> signOut(@PathVariable("token") String token){
+    return ResponseEntity.ok().body(authenticationService.signOut(token));
+  }
 }

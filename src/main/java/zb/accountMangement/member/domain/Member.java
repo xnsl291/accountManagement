@@ -40,7 +40,7 @@ public class Member {
 
   @Enumerated(EnumType.STRING)
   @Builder.Default
-  private RoleType role = RoleType.PENDING;
+  private RoleType role = RoleType.USER;
 
   @CreatedDate
   private LocalDateTime createdAt;
