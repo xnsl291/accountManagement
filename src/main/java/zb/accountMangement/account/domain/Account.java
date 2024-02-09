@@ -34,7 +34,7 @@ public class Account {
   private long amount =0;
 
   @Builder.Default
-  private AccountStatus status = AccountStatus.PENDING;
+  private AccountStatus status = AccountStatus.EXISTS;
 
   @CreatedDate
   private LocalDateTime createdAt;

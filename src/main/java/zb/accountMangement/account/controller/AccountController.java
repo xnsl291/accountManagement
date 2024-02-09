@@ -1,0 +1,65 @@
+package zb.accountMangement.account.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import zb.accountMangement.account.domain.Account;
+import zb.accountMangement.account.dto.AccountManagementDto;
+import zb.accountMangement.account.service.AccountService;
+import zb.accountMangement.common.auth.JwtTokenProvider;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/accounts")
+public class AccountController {
+  private AccountService accountService;
+  private JwtTokenProvider tokenProvider;
+
+  /**
+   * 계좌개설
+   * @param token - 토큰
+   * @param accountManagementDto
+   * @return Account
+   */
+  @PostMapping("/open")
+  public ResponseEntity<Account> openAccount(@RequestHeader(value = "Authorization") String token, @RequestBody AccountManagementDto accountManagementDto){
+    return ResponseEntity.ok().body(accountService.openAccount(tokenProvider.getId(token), accountManagementDto));
+  }
+
+  /**
+   * 계좌 정보 조회
+   * @param accountId - 계좌 ID
+   * @return Account
+   */
+  @GetMapping("/{account_id}")
+  public ResponseEntity<Account> getAccountInfo(@PathVariable("account_id") Long accountId){
+    return ResponseEntity.ok().body(accountService.getAccountInfo(accountId));
+  }
+
+  /**
+   * 계좌 수정
+   * @param accountId - 계좌 ID
+   * @return Account
+   */
+    @PatchMapping("/{account_id}/update")
+    public ResponseEntity<Account> updateAccountInfo(
+              @PathVariable("account_id") Long accountId
+            , @RequestBody AccountManagementDto accountManagementDto){
+      return ResponseEntity.ok().body(accountService.updateAccount(accountId,accountManagementDto));
+    }
+
+  /**
+   * 계좌 해지
+   * @param accountId - 계좌 ID
+   * @return 성공여부
+   */
+  @PatchMapping("/{account_id}/delete")
+  public ResponseEntity<Boolean> deleteAccountInfo(@PathVariable("account_id")Long accountId){
+    return ResponseEntity.ok().body(accountService.deleteAccount(accountId));
+  }
+
+  // 전체계좌조회 - 소유한 모든 계좌 조히
+
+
+
+}

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zb.accountMangement.account.dto.OpenAccountDto;
+import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
@@ -56,12 +56,12 @@ public class AuthenticationService {
         .build();
 
     // 초기 계좌 생성
-    OpenAccountDto openAccountDto = OpenAccountDto.builder()
+    AccountManagementDto accountManagementDto = AccountManagementDto.builder()
             .nickname(null)
             .password(passwordEncoder.encode(signUpDto.getInitialAccountPassword()))
             .build();
 
-    accountService.openAccount(member.getId(),openAccountDto);
+    accountService.openAccount(member.getId(), accountManagementDto);
     memberRepository.save(member);
   }
 

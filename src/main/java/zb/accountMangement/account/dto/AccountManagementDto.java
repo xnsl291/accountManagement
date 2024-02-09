@@ -4,12 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import zb.accountMangement.account.type.AccountStatus;
 
 @Getter
 @Setter
 @Builder
-public class OpenAccountDto {
+public class AccountManagementDto {
 
   private String nickname;
 
