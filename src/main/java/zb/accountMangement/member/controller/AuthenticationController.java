@@ -42,7 +42,7 @@ public class AuthenticationController {
    * @param findUserInfoDto
    * @return "인증 메세지 발송 완료"
    */
-  @GetMapping("/find-pw/{user_id}")
+  @PostMapping("/find-pw/{user_id}")
   public ResponseEntity<String> requestResetPw(
       @PathVariable("user_id") Long userId,
       @RequestBody FindUserInfoDto findUserInfoDto) {

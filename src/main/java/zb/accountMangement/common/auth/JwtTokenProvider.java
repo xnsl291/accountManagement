@@ -99,6 +99,10 @@ public class JwtTokenProvider {
                 .toString();
     }
 
+    public  Long getId(String token){
+        return Long.valueOf(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token)).getBody().getId());
+    }
+
     public String getAuthority(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(getRawToken(token)).getBody()
                 .get("authority")

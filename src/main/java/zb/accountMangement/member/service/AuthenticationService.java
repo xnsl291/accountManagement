@@ -60,7 +60,8 @@ public class AuthenticationService {
             .nickname(null)
             .password(passwordEncoder.encode(signUpDto.getInitialAccountPassword()))
             .build();
-    accountService.openAccount(openAccountDto);
+
+    accountService.openAccount(member.getId(),openAccountDto);
     memberRepository.save(member);
   }
 

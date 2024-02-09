@@ -26,7 +26,7 @@ public class AccountService {
   }
 
   @Transactional
-  public Account openAccount(OpenAccountDto openAccountDto) {
+  public Account openAccount(Long userId, OpenAccountDto openAccountDto) {
 
       // 계좌번호 랜덤생성 - 중복 생성 x
       String accountNumber = createAccountNumber();
@@ -35,18 +35,15 @@ public class AccountService {
         accountNumber = createAccountNumber();
       }
 
-
-      Account account = new Account();
-
-      account.setAccountNumber(accountNumber);
-      account.setNickname(openAccountDto.getNickname());
-      account.setPassword(passwordEncoder.encode(openAccountDto.getPassword()));
-      account.setStatus(AccountStatus.EXISTS);
+      Account account = Account.builder()
+              .accountNumber(accountNumber)
+              .userId(userId)
+              .nickname(openAccountDto.getNickname())
+              .password(passwordEncoder.encode(openAccountDto.getPassword()))
+              .status(AccountStatus.EXISTS)
+              .build();
 
       accountRepository.save(account);
       return account;
-
   }
-
-
 }
