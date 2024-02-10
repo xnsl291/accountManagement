@@ -31,7 +31,7 @@ public class AccountService {
      * @param accountId - 계좌 ID
      * @return 결과 (T/F)
      */
-    private boolean isExistAccount(Long accountId){
+    public boolean isExistAccount(Long accountId){
 
         Account account = accountRepository.findById(accountId)
         .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
