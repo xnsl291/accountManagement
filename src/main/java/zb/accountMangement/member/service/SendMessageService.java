@@ -1,4 +1,4 @@
-package zb.accountMangement.service;
+package zb.accountMangement.member.service;
 
 import static zb.accountMangement.common.type.RedisTime.PHONE_VALID;
 
@@ -11,7 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import zb.accountMangement.common.util.RedisUtil;
-import zb.accountMangement.dto.SmsVerificationInfo;
+import zb.accountMangement.member.dto.SmsVerificationDto;
 
 @Service
 @Slf4j
@@ -34,7 +34,7 @@ public class SendMessageService {
      * 핸드폰 인증 문자 발송
      * @param phoneNumber 핸드폰번호
      */
-    public void sendVerificationMessage(String phoneNumber) {
+    public String sendVerificationMessage(String phoneNumber) {
         String verificationCode = RandomStringUtils.random(VERIFY_CODE_LEN, false, true);
         //TODO: 로그인 후, 토큰 받아와서 REDIS에 토큰정보도 함께 저장
         Message coolsms = new Message(apiKey, secretKey);
@@ -55,17 +55,18 @@ public class SendMessageService {
             log.info(e.getMessage());
             throw new RuntimeException(e);
         }
+        return "인증 메세지 발송 완료";
     }
 
     /**
      * 토큰정보 + 인증번호가 일치하는지 확인
      *
-     * @param smsVerificationInfo - token, phoneNumber,inputCode
-     * @return boolean
+     * @param smsVerificationDto - token, phoneNumber,inputCode
+     * @return 일치여부
      */
-    public boolean verifyCode(SmsVerificationInfo smsVerificationInfo) {
+    public boolean verifyCode(SmsVerificationDto smsVerificationDto) {
         //TODO : getMsgVerificationInfo 사용해서 토큰 정보 맞는지 확인. (인증번호 + 토큰 일치해야함)
-        SmsVerificationInfo info = redisUtil.getMsgVerificationInfo(senderPhoneNumber);
-        return info.getVerificationCode().equals(smsVerificationInfo.getVerificationCode());
+        SmsVerificationDto info = redisUtil.getMsgVerificationInfo(senderPhoneNumber);
+        return info.getVerificationCode().equals(smsVerificationDto.getVerificationCode());
     }
 }
