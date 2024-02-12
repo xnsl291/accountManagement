@@ -3,6 +3,7 @@ package zb.accountMangement.account.domain;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.type.AccountStatus;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
+  private AccountRepository accountRepository;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +33,9 @@ public class Account {
   private String accountNumber;
 
   @Builder.Default
-  private long amount =0;
+  private long balance =0;
 
+  @Enumerated(EnumType.STRING)
   @Builder.Default
   private AccountStatus status = AccountStatus.EXISTS;
 
@@ -40,4 +43,11 @@ public class Account {
   private LocalDateTime createdAt;
 
   private LocalDateTime deletedAt;
+
+  public boolean isExistsAccount() {
+    return status.equals(AccountStatus.EXISTS);
+  }
+  public boolean isDeletedAccount() {
+    return status.equals(AccountStatus.DELETED);
+  }
 }

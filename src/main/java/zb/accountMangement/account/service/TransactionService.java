@@ -3,24 +3,27 @@ package zb.accountMangement.account.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.domain.Transaction;
 import zb.accountMangement.account.dto.TransactionDto;
 import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.repository.TransactionRepository;
 import zb.accountMangement.account.type.TransactionType;
+import zb.accountMangement.common.exception.InvalidAccountException;
 import zb.accountMangement.common.exception.OverdrawException;
 import zb.accountMangement.common.exception.NotFoundAccountException;
 import zb.accountMangement.common.exception.NotFoundUserException;
 import zb.accountMangement.common.type.ErrorCode;
+import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.repository.MemberRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class TransactionService {
     private final AccountRepository accountRepository;
@@ -36,17 +39,22 @@ public class TransactionService {
         Account account = accountRepository.findByAccountNumber(accountNumber)
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
 
-        if (accountService.isExistAccount(account.getId()))
+        if (!account.isDeletedAccount())
             return memberRepository.findById(account.getUserId()).orElseThrow(
-                () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST)).getName;
-
-        return "";
+                () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST)).getName();
+        throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
     }
 
+    /**
+     * 입금
+     * @param depositDto - TransactionDto
+     * @return "입금완료"
+     */
+    @Transactional
     public String deposit(TransactionDto depositDto) {
         Account account = accountRepository.findById(depositDto.getAccountId())
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        if (accountService.isExistAccount(account.getId())) {
+        if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
                     .accountId(depositDto.getAccountId())
                     .type(TransactionType.DEPOSIT)
@@ -59,9 +67,15 @@ public class TransactionService {
             account.setBalance(account.getBalance() + depositDto.getAmount());
             return "입금완료";
         }
-        return "입금실페";
+        throw new InvalidAccountException(ErrorCode.INVALID_ACCOUNT);
     }
 
+    /**
+     * 출금
+     * @param withdrawalDto - TransactionDto
+     * @return "출금완료"
+     */
+    @Transactional
     public String withdrawal(TransactionDto withdrawalDto) {
 
         Account account = accountRepository.findById(withdrawalDto.getAccountId())
@@ -70,7 +84,7 @@ public class TransactionService {
         if (account.getBalance() < withdrawalDto.getAmount())
             throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
 
-        if (accountService.isExistAccount(account.getId())) {
+        if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
                     .accountId(withdrawalDto.getAccountId())
                     .type(TransactionType.WITHDRAWN)
@@ -82,9 +96,15 @@ public class TransactionService {
             account.setBalance(account.getBalance()-withdrawalDto.getAmount());
             return "출금완료";
         }
-        return "출금실패";
+        throw new InvalidAccountException(ErrorCode.INVALID_ACCOUNT);
     }
 
+    /**
+     * 송금
+     * @param transferDto - TransactionDto
+     * @return "송금완료"
+     */
+    @Transactional
     public String transfer(TransactionDto transferDto) {
 
         Account senderAccount = accountRepository.findById(transferDto.getAccountId())
@@ -100,7 +120,7 @@ public class TransactionService {
         if (senderAccount.getBalance() < transferDto.getAmount())
             throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
 
-        if (accountService.isExistAccount(senderAccount.getId()) && accountService.isExistAccount(recipientAccount.getId()) ) {
+        if (senderAccount.isExistsAccount() && recipientAccount.isExistsAccount()){
             Transaction senderTransaction = Transaction.builder()
                     .accountId(transferDto.getAccountId())
                     .type(TransactionType.TRANSFER)
@@ -123,7 +143,7 @@ public class TransactionService {
             recipientAccount.setBalance(recipientAccount.getBalance() + transferDto.getAmount());
             return "송금완료";
         }
-        return "송금실패";
+        throw new InvalidAccountException(ErrorCode.INVALID_ACCOUNT);
     }
 
     /**

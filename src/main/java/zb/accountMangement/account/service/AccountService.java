@@ -19,30 +19,13 @@ import zb.accountMangement.common.type.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class AccountService {
 
     private final int ACCOUNT_NUMBER_LENGTH = 14;
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    /**
-     * 계좌 상태가 EXIST 인지 판별
-     * @param accountId - 계좌 ID
-     * @return 결과 (T/F)
-     */
-    public boolean isExistAccount(Long accountId){
-
-        Account account = accountRepository.findById(accountId)
-        .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-
-        if (account.getStatus().equals(AccountStatus.DELETED))
-            throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
-        else if(account.getStatus().equals(AccountStatus.PENDING))
-            throw new InvalidAccountException(ErrorCode.PENDING_ACCOUNT);
-
-        return true;
-    }
 
     /**
      * 계좌번호 생성
@@ -89,7 +72,7 @@ public class AccountService {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
 
-        if (account.getStatus().equals(AccountStatus.DELETED))
+        if (account.isDeletedAccount())
             throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
 
         return account;
@@ -101,16 +84,21 @@ public class AccountService {
      * @param accountManagementDto
      * @return Account
      */
+    @Transactional
     public Account updateAccount(Long accountId, AccountManagementDto accountManagementDto) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
 
-        if (isExistAccount(accountId)) {
+        if (account.isExistsAccount()) {
             account.setNickname(accountManagementDto.getNickname());
             account.setPassword(accountManagementDto.getPassword());
         }
-        return account;
+        else if (account.isDeletedAccount())
+            throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
+        else
+            throw new InvalidAccountException(ErrorCode.PENDING_ACCOUNT);
 
+        return account;
     }
 
     /**
@@ -118,6 +106,7 @@ public class AccountService {
      * @param accountId - 계좌 ID
      * @return 성공여부
      */
+    @Transactional
     public Boolean deleteAccount(Long accountId) {
         boolean result = false;
 
@@ -127,7 +116,7 @@ public class AccountService {
         List<Account> userAccounts = accountRepository.findByUserId(account.getUserId());
 
         // 사용자가 2개 이상의 계좌를 가지고 있어야 삭제 가능
-        if( isExistAccount(accountId) && userAccounts.size() >= 2 ) {
+        if( account.isExistsAccount() && userAccounts.size() >= 2 ) {
             account.setStatus(AccountStatus.DELETED);
             account.setDeletedAt(LocalDateTime.now());
             result = true;
