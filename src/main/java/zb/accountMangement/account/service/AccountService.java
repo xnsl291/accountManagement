@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class AccountService {
      * @param accountId - 계좌 ID
      * @return 결과 (T/F)
      */
-    private boolean isExistAccount(Long accountId){
+    public boolean isExistAccount(Long accountId){
 
         Account account = accountRepository.findById(accountId)
         .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
@@ -134,4 +135,11 @@ public class AccountService {
 
         return result;
     }
+
+
+    // 전체 계좌 조회
+    public List<Account> getAllAccounts(Long userId){
+        return accountRepository.findByUserId(userId);
+    }
+
 }

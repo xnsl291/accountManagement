@@ -8,6 +8,8 @@ import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtTokenProvider;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/accounts")
@@ -58,8 +60,13 @@ public class AccountController {
     return ResponseEntity.ok().body(accountService.deleteAccount(accountId));
   }
 
-  // 전체계좌조회 - 소유한 모든 계좌 조히
-
-
-
+  /**
+   * 사용자가 소유한 전체계좌조회
+   * @param userId - 사용자 ID
+   * @return 사용자가 소유한 계좌 리스트
+   */
+  @GetMapping("/{user_id}")
+  public ResponseEntity<List<Account>> getAllAccounts(@PathVariable("user_id")Long userId){
+    return ResponseEntity.ok().body(accountService.getAllAccounts(userId));
+  }
 }
