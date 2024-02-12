@@ -18,6 +18,7 @@ import zb.accountMangement.member.type.RoleType;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthenticationService {
   private final MemberRepository memberRepository;
   private final JwtTokenProvider jwtTokenProvider;
@@ -91,6 +92,7 @@ public class AuthenticationService {
    * @param resetPwDto
    * @return "비밀번호 재설정 완료"
    */
+  @Transactional
   public String verifyResetPw(Long userId, ResetPwDto resetPwDto) {
     Member member = memberRepository.findById(userId)
         .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
