@@ -7,9 +7,6 @@ import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.common.exception.NotFoundUserException;
 import zb.accountMangement.member.repository.MemberRepository;
-import zb.accountMangement.member.type.RoleType;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -42,17 +39,4 @@ public class MemberService {
       memberRepository.save(member);
       return member;
   }
-
-  /**
-   * 회원탈퇴
-   * @param userId - id
-   */
-  public String deleteUser(long userId){
-    Member member = memberRepository.findById(userId).orElseThrow(
-        () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
-
-      member.setRole(RoleType.WITHDRAWN);
-      member.setDeletedAt(LocalDateTime.now());
-      return "회원탈퇴완료";
-    }
 }

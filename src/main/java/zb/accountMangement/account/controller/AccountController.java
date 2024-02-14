@@ -2,7 +2,6 @@ package zb.accountMangement.account.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.dto.AccountManagementDto;
@@ -15,8 +14,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/accounts")
 public class AccountController {
-  private AccountService accountService;
-  private JwtTokenProvider tokenProvider;
+  private final AccountService accountService;
+  private final JwtTokenProvider tokenProvider;
 
   /**
    * 계좌개설
@@ -25,7 +24,9 @@ public class AccountController {
    * @return Account
    */
   @PostMapping("/open")
-  public ResponseEntity<Account> openAccount(@RequestHeader(value = "Authorization") String token, @RequestBody AccountManagementDto accountManagementDto){
+  public ResponseEntity<Account> openAccount(
+          @RequestHeader(value = "Authorization") String token,
+          @RequestBody AccountManagementDto accountManagementDto){
     return ResponseEntity.ok().body(accountService.openAccount(tokenProvider.getId(token), accountManagementDto));
   }
 
@@ -44,10 +45,10 @@ public class AccountController {
    * @param accountId - 계좌 ID
    * @return Account
    */
-    @PatchMapping("/{account_id}/update")
+    @PatchMapping("/{account_id}")
     public ResponseEntity<Account> updateAccountInfo(
-              @PathVariable("account_id") Long accountId
-            , @RequestBody AccountManagementDto accountManagementDto){
+              @PathVariable("account_id") Long accountId,
+              @RequestBody AccountManagementDto accountManagementDto){
       return ResponseEntity.ok().body(accountService.updateAccount(accountId,accountManagementDto));
     }
 
@@ -56,7 +57,7 @@ public class AccountController {
    * @param accountId - 계좌 ID
    * @return 성공여부
    */
-  @PatchMapping("/{account_id}/delete")
+  @DeleteMapping("/{account_id}")
   public ResponseEntity<Boolean> deleteAccountInfo(@PathVariable("account_id")Long accountId){
     return ResponseEntity.ok().body(accountService.deleteAccount(accountId));
   }

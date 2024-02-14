@@ -30,21 +30,10 @@ public class MemberController {
    * @param updateUserDto - 수정할 정보
    * @return "수정완료"
    */
-  @PatchMapping("/update/{user_id}")
+  @PatchMapping("/{user_id}")
   public ResponseEntity<Member> updateUserInfo(
       @PathVariable("user_id") long userId,
       @RequestBody UpdateUserDto updateUserDto){
     return ResponseEntity.ok().body(memberService.updateUserInfo(userId, updateUserDto));
   }
-
-  /**
-   * 회원탈퇴
-   * @param userId - id
-   * @return "회원탈퇴완료"
-   */
-  @PatchMapping("/{user_id}")
-  public ResponseEntity<String> deleteUserInfo(@PathVariable("user_id") long userId){
-    return ResponseEntity.ok().body(memberService.deleteUser(userId));
-  }
-
 }

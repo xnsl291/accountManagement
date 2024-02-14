@@ -16,6 +16,8 @@ import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.repository.MemberRepository;
 import zb.accountMangement.member.type.RoleType;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -63,6 +65,19 @@ public class AuthenticationService {
 
     accountService.openAccount(member.getId(), accountManagementDto);
     memberRepository.save(member);
+  }
+
+  /**
+   * 회원탈퇴
+   * @param userId - id
+   */
+  public String deleteUser(long userId){
+    Member member = memberRepository.findById(userId).orElseThrow(
+            () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+
+    member.setRole(RoleType.WITHDRAWN);
+    member.setDeletedAt(LocalDateTime.now());
+    return "회원탈퇴완료";
   }
 
   /**

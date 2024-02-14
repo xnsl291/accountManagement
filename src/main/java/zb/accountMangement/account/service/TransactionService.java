@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class TransactionService {
     private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
-    private final AccountService accountService;
     private final TransactionRepository transactionRepository;
     /**
      * 계좌 소유주 확인
@@ -105,11 +104,11 @@ public class TransactionService {
      * @return "송금완료"
      */
     @Transactional
-    public String transfer(TransactionDto transferDto) {
+    public String transfer(Long senderAccountId, Long receiverAccountId, TransactionDto transferDto) {
 
-        Account senderAccount = accountRepository.findById(transferDto.getAccountId())
+        Account senderAccount = accountRepository.findById(senderAccountId)
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        Account recipientAccount = accountRepository.findById(transferDto.getAccountId())
+        Account recipientAccount = accountRepository.findById(receiverAccountId)
                         .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
 
         Member sender = memberRepository.findById(senderAccount.getUserId())
@@ -122,7 +121,7 @@ public class TransactionService {
 
         if (senderAccount.isExistsAccount() && recipientAccount.isExistsAccount()){
             Transaction senderTransaction = Transaction.builder()
-                    .accountId(transferDto.getAccountId())
+                    .accountId(senderAccountId)
                     .type(TransactionType.TRANSFER)
                     .amount(-transferDto.getAmount())
                     .name(receiver.getName()) // 수신자 이름
@@ -131,10 +130,10 @@ public class TransactionService {
             transactionRepository.save(senderTransaction);
 
             Transaction recipientTransaction = Transaction.builder()
-                    .accountId(transferDto.getAccountId())
+                    .accountId(receiverAccountId)
                     .type(TransactionType.TRANSFER)
                     .amount(transferDto.getAmount())
-                    .name(sender.getName()) // 발신자 이름???
+                    .name(sender.getName()) // 발신자 이름
                     .memo(transferDto.getMemo())
                     .build();
             transactionRepository.save(recipientTransaction);

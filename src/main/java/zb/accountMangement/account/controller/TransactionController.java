@@ -3,7 +3,6 @@ package zb.accountMangement.account.controller;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.account.dto.TransactionDto;
 import zb.accountMangement.account.service.TransactionService;
@@ -19,7 +18,7 @@ public class TransactionController {
    * @param accountNumber - 계좌번호
    * @return 사용자이름
    */
-  @GetMapping("/validateRecipient/{account_number}")
+  @GetMapping("/validation/{account_number}")
   public ResponseEntity<String> validateRecipient(@PathVariable("account_number")String accountNumber) {
     return ResponseEntity.ok().body(transactionService.validateRecipient(accountNumber));
   }
@@ -49,9 +48,12 @@ public class TransactionController {
    * @param transferDto - TransactionDto
    * @return "송금완료"
    */
-  @PostMapping("/deposit")
-  public ResponseEntity<String> transfer(@RequestBody TransactionDto transferDto) {
-    return ResponseEntity.ok().body(transactionService.transfer(transferDto));
+  @PostMapping("{sender_account_id}/transfer/{receiver_account_id}")
+  public ResponseEntity<String> transfer(
+          @PathVariable("sender_account_id") Long senderAccountId ,
+          @PathVariable("receiver_account_id") Long receiverAccountId,
+          @RequestBody TransactionDto transferDto) {
+    return ResponseEntity.ok().body(transactionService.transfer(senderAccountId, receiverAccountId,transferDto));
   }
 
   /**
@@ -59,10 +61,8 @@ public class TransactionController {
    * @param accountId - 계좌 ID
    * @return 거래내역 리스트
    */
-  @GetMapping("/{accountId}")
+  @GetMapping("/{accountId}/history")
   public ResponseEntity<List<TransactionDto>> getTransactionsByAccountId(@PathVariable Long accountId) {
     return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId));
   }
-
-
 }

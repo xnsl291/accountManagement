@@ -3,7 +3,6 @@ package zb.accountMangement.account.domain;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.type.AccountStatus;
 
 import javax.persistence.*;
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
-  private AccountRepository accountRepository;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

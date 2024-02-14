@@ -27,6 +27,16 @@ public class AuthenticationController {
   }
 
   /**
+   * 회원탈퇴
+   * @param userId - id
+   * @return "회원탈퇴완료"
+   */
+  @DeleteMapping("/{user_id}")
+  public ResponseEntity<String> deleteUserInfo(@PathVariable("user_id") long userId){
+    return ResponseEntity.ok().body(authenticationService.deleteUser(userId));
+  }
+
+  /**
    * 핸드폰 인증 성공 여부
    * @param smsVerificationDto
    * @return 성공여부 (T/F)
