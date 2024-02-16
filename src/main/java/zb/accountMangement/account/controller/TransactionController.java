@@ -3,12 +3,17 @@ package zb.accountMangement.account.controller;
 import lombok.RequiredArgsConstructor;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.account.dto.TransactionDto;
 import zb.accountMangement.account.service.TransactionService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/transactions")
 public class TransactionController {
   private final TransactionService transactionService;
@@ -19,7 +24,8 @@ public class TransactionController {
    * @return 사용자이름
    */
   @GetMapping("/validation/{account_number}")
-  public ResponseEntity<String> validateRecipient(@PathVariable("account_number")String accountNumber) {
+  public ResponseEntity<String> validateRecipient(
+          @PathVariable("account_number")String accountNumber) {
     return ResponseEntity.ok().body(transactionService.validateRecipient(accountNumber));
   }
 
@@ -29,7 +35,8 @@ public class TransactionController {
    * @return "입금완료"
    */
   @PostMapping("/deposit")
-  public ResponseEntity<String> deposit(@RequestBody TransactionDto depositDto) {
+  public ResponseEntity<String> deposit(
+          @Valid @RequestBody TransactionDto depositDto) {
     return ResponseEntity.ok().body(transactionService.deposit(depositDto));
   }
 
@@ -39,7 +46,8 @@ public class TransactionController {
    * @return "출금완료"
    */
   @PostMapping("/withdrawal")
-  public ResponseEntity<String> withdrawal(@RequestBody TransactionDto withdrawalDto) {
+  public ResponseEntity<String> withdrawal(
+          @Valid @RequestBody TransactionDto withdrawalDto) {
     return ResponseEntity.ok().body(transactionService.withdrawal(withdrawalDto));
   }
 
@@ -50,9 +58,9 @@ public class TransactionController {
    */
   @PostMapping("{sender_account_id}/transfer/{receiver_account_id}")
   public ResponseEntity<String> transfer(
-          @PathVariable("sender_account_id") Long senderAccountId ,
-          @PathVariable("receiver_account_id") Long receiverAccountId,
-          @RequestBody TransactionDto transferDto) {
+          @PathVariable("sender_account_id") @Min(1) Long senderAccountId ,
+          @PathVariable("receiver_account_id") @Min(1) Long receiverAccountId,
+          @Valid @RequestBody TransactionDto transferDto) {
     return ResponseEntity.ok().body(transactionService.transfer(senderAccountId, receiverAccountId,transferDto));
   }
 
@@ -62,7 +70,8 @@ public class TransactionController {
    * @return 거래내역 리스트
    */
   @GetMapping("/{accountId}/history")
-  public ResponseEntity<List<TransactionDto>> getTransactionsByAccountId(@PathVariable Long accountId) {
+  public ResponseEntity<List<TransactionDto>> getTransactionsByAccountId(
+          @PathVariable @Min(1) Long accountId) {
     return ResponseEntity.ok(transactionService.getTransactionsByAccountId(accountId));
   }
 }

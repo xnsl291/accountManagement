@@ -2,13 +2,18 @@ package zb.accountMangement.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.service.MemberService;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/member")
 public class MemberController {
   private final MemberService memberService;
@@ -20,7 +25,8 @@ public class MemberController {
    * @return Member
    */
   @GetMapping("/{user_id}")
-  public ResponseEntity<Member> getUserInfo(@PathVariable("user_id") long userId  ){
+  public ResponseEntity<Member> getUserInfo(
+          @PathVariable("user_id") @Min(1) Long userId  ){
     return ResponseEntity.ok().body(memberService.getUserInfo(userId));
   }
 
@@ -32,8 +38,8 @@ public class MemberController {
    */
   @PatchMapping("/{user_id}")
   public ResponseEntity<Member> updateUserInfo(
-      @PathVariable("user_id") long userId,
-      @RequestBody UpdateUserDto updateUserDto){
+      @PathVariable("user_id") @Min(1) long userId,
+      @RequestBody @Valid UpdateUserDto updateUserDto){
     return ResponseEntity.ok().body(memberService.updateUserInfo(userId, updateUserDto));
   }
 }

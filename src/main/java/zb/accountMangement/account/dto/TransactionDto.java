@@ -4,7 +4,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.data.annotation.CreatedDate;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,13 +17,14 @@ public class TransactionDto {
   @NotNull
   private Long accountId;
 
-  @NotNull
+  @NotBlank
   private String name;
 
-  @NotNull
+  @NotBlank
   private Long amount;
 
   private String memo;
 
+  @CreatedDate
   private LocalDateTime TransactedAt;
 }

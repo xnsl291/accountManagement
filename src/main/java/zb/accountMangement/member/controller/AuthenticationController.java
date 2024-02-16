@@ -2,14 +2,18 @@ package zb.accountMangement.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.service.AuthenticationService;
 import zb.accountMangement.member.service.SendMessageService;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 @RestController
 @RequiredArgsConstructor
+@Validated
 @RequestMapping("/api/auth")
 public class AuthenticationController {
   private final AuthenticationService authenticationService;
@@ -21,7 +25,7 @@ public class AuthenticationController {
    * @return 성공여부
    */
   @PostMapping("/sign-up")
-  public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto){
+  public ResponseEntity<String> signUp(@Valid @RequestBody SignUpDto signUpDto){
     authenticationService.signUp(signUpDto);
     return ResponseEntity.ok().body("회원가입 성공");
   }
@@ -32,7 +36,8 @@ public class AuthenticationController {
    * @return "회원탈퇴완료"
    */
   @DeleteMapping("/{user_id}")
-  public ResponseEntity<String> deleteUserInfo(@PathVariable("user_id") long userId){
+  public ResponseEntity<String> deleteUserInfo(
+          @PathVariable("user_id") @Min(1) Long userId){
     return ResponseEntity.ok().body(authenticationService.deleteUser(userId));
   }
 
@@ -42,7 +47,8 @@ public class AuthenticationController {
    * @return 성공여부 (T/F)
    */
   @PostMapping("/verify-phone")
-  public ResponseEntity<Boolean> verifySMS(@RequestBody SmsVerificationDto smsVerificationDto) {
+  public ResponseEntity<Boolean> verifySMS(
+          @Valid @RequestBody SmsVerificationDto smsVerificationDto) {
     return ResponseEntity.ok().body(sendMessageService.verifyCode(smsVerificationDto));
   }
 
@@ -54,8 +60,8 @@ public class AuthenticationController {
    */
   @PostMapping("/find-pw/{user_id}")
   public ResponseEntity<String> requestResetPw(
-      @PathVariable("user_id") Long userId,
-      @RequestBody FindUserInfoDto findUserInfoDto) {
+      @PathVariable("user_id") @Min(1) Long userId,
+      @Valid @RequestBody FindUserInfoDto findUserInfoDto) {
     return ResponseEntity.ok().body(authenticationService.requestResetPw(userId,findUserInfoDto));
   }
 
@@ -67,19 +73,19 @@ public class AuthenticationController {
    */
   @PatchMapping("/find-pw/{user_id}/confirm")
   public ResponseEntity<String> verifyResetPw(
-      @PathVariable("user_id") Long userId,
-      @RequestBody ResetPwDto resetPwDto) {
+      @PathVariable("user_id") @Min(1) Long userId,
+      @Valid @RequestBody ResetPwDto resetPwDto) {
 
     return ResponseEntity.ok().body(authenticationService.verifyResetPw(userId,resetPwDto));
   }
 
   @PostMapping("/login")
-  public ResponseEntity<JwtToken> signIn(@RequestBody SignInDto signInDto){
+  public ResponseEntity<JwtToken> signIn(@Valid @RequestBody SignInDto signInDto){
     return ResponseEntity.ok().body(authenticationService.signIn(signInDto));
   }
 
-  @PostMapping("/logout/{token}")
-  public ResponseEntity<String> signOut(@PathVariable("token") String token){
+  @PostMapping("/logout")
+  public ResponseEntity<String> signOut(@RequestHeader(value = "Authorization") String token){
     return ResponseEntity.ok().body(authenticationService.signOut(token));
   }
 }
