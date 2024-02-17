@@ -33,6 +33,7 @@ public class Account {
   @Builder.Default
   private long amount =0;
 
+  @Enumerated(EnumType.STRING)
   @Builder.Default
   private AccountStatus status = AccountStatus.EXISTS;
 

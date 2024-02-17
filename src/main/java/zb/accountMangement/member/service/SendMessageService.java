@@ -10,12 +10,14 @@ import net.nurigo.java_sdk.exceptions.CoolsmsException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.common.util.RedisUtil;
 import zb.accountMangement.member.dto.SmsVerificationDto;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class SendMessageService {
 
     private final RedisUtil redisUtil;

@@ -20,6 +20,7 @@ import zb.accountMangement.common.type.ErrorCode;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class AccountService {
 
     private final int ACCOUNT_NUMBER_LENGTH = 14;
@@ -101,6 +102,7 @@ public class AccountService {
      * @param accountManagementDto
      * @return Account
      */
+    @Transactional
     public Account updateAccount(Long accountId, AccountManagementDto accountManagementDto) {
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
@@ -118,6 +120,7 @@ public class AccountService {
      * @param accountId - 계좌 ID
      * @return 성공여부
      */
+    @Transactional
     public Boolean deleteAccount(Long accountId) {
         boolean result = false;
 
@@ -127,7 +130,7 @@ public class AccountService {
         List<Account> userAccounts = accountRepository.findByUserId(account.getUserId());
 
         // 사용자가 2개 이상의 계좌를 가지고 있어야 삭제 가능
-        if( isExistAccount(accountId) && userAccounts.size() >= 2 ) {
+        if(isExistAccount(accountId) && userAccounts.size() >= 2) {
             account.setStatus(AccountStatus.DELETED);
             account.setDeletedAt(LocalDateTime.now());
             result = true;

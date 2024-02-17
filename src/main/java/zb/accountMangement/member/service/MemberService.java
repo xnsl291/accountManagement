@@ -2,6 +2,7 @@ package zb.accountMangement.member.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MemberService {
   private final MemberRepository memberRepository;
 
@@ -32,6 +34,7 @@ public class MemberService {
    * @param updateUserDto
    * @return Member
    */
+  @Transactional
   public Member updateUserInfo(long userId, UpdateUserDto updateUserDto) {
     Member member = memberRepository.findById(userId).orElseThrow(
         () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
@@ -47,6 +50,7 @@ public class MemberService {
    * 회원탈퇴
    * @param userId - id
    */
+  @Transactional
   public String deleteUser(long userId){
     Member member = memberRepository.findById(userId).orElseThrow(
         () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
