@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthenticationService {
   private final MemberRepository memberRepository;
   private final JwtTokenProvider jwtTokenProvider;
@@ -71,6 +72,7 @@ public class AuthenticationService {
    * 회원탈퇴
    * @param userId - id
    */
+  @Transactional
   public String deleteUser(long userId){
     Member member = memberRepository.findById(userId).orElseThrow(
             () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
@@ -106,6 +108,7 @@ public class AuthenticationService {
    * @param resetPwDto
    * @return "비밀번호 재설정 완료"
    */
+  @Transactional
   public String verifyResetPw(Long userId, ResetPwDto resetPwDto) {
     Member member = memberRepository.findById(userId)
         .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
@@ -122,12 +125,11 @@ public class AuthenticationService {
     // 핸드폰 인증 번호가 같으면
     if (info.getVerificationCode().equals(resetPwDto.getInputCode())) {
       member.setPassword(resetPwDto.getNewPassword());
-      memberRepository.save(member);
 
       // 인증 정보 삭제
       redisUtil.deleteMsgVerificationInfo(resetPwDto.getToken());
     } else
-      throw new UnmatchedCodeException(ErrorCode.UNMATCHED_VERIFICATION_CODE);
+        throw new UnmatchedCodeException(ErrorCode.UNMATCHED_VERIFICATION_CODE);
 
     return "비밀번호 재설정 완료";
   }
