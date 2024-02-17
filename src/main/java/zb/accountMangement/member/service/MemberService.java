@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
-import zb.accountMangement.common.exception.NotFoundUserException;
+import zb.accountMangement.common.error.exception.NotFoundUserException;
 import zb.accountMangement.member.repository.MemberRepository;
 
 @Service

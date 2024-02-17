@@ -13,8 +13,7 @@ import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.type.AccountStatus;
-import zb.accountMangement.common.exception.InvalidAccountException;
-import zb.accountMangement.common.exception.NotFoundAccountException;
+import zb.accountMangement.common.error.exception.NotFoundAccountException;
 import zb.accountMangement.common.type.ErrorCode;
 
 @Service
@@ -43,7 +42,6 @@ public class AccountService {
      */
     @Transactional
     public Account openAccount(Long userId, AccountManagementDto accountManagementDto) {
-
         // 계좌번호 랜덤생성 - 중복 생성 x
         String accountNumber = createAccountNumber();
 
@@ -73,7 +71,7 @@ public class AccountService {
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
 
         if (account.isDeletedAccount())
-            throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
+            throw new NotFoundAccountException(ErrorCode.DELETED_ACCOUNT);
 
         return account;
     }
@@ -94,9 +92,9 @@ public class AccountService {
             account.setPassword(accountManagementDto.getPassword());
         }
         else if (account.isDeletedAccount())
-            throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
+            throw new NotFoundAccountException(ErrorCode.DELETED_ACCOUNT);
         else
-            throw new InvalidAccountException(ErrorCode.PENDING_ACCOUNT);
+            throw new NotFoundAccountException(ErrorCode.PENDING_ACCOUNT);
 
         return account;
     }

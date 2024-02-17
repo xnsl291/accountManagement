@@ -10,10 +10,9 @@ import zb.accountMangement.account.dto.TransactionDto;
 import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.repository.TransactionRepository;
 import zb.accountMangement.account.type.TransactionType;
-import zb.accountMangement.common.exception.InvalidAccountException;
-import zb.accountMangement.common.exception.OverdrawException;
-import zb.accountMangement.common.exception.NotFoundAccountException;
-import zb.accountMangement.common.exception.NotFoundUserException;
+import zb.accountMangement.common.error.exception.OverdrawException;
+import zb.accountMangement.common.error.exception.NotFoundAccountException;
+import zb.accountMangement.common.error.exception.NotFoundUserException;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.repository.MemberRepository;
@@ -41,7 +40,7 @@ public class TransactionService {
         if (!account.isDeletedAccount())
             return memberRepository.findById(account.getUserId()).orElseThrow(
                 () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST)).getName();
-        throw new InvalidAccountException(ErrorCode.DELETED_ACCOUNT);
+        throw new NotFoundAccountException(ErrorCode.DELETED_ACCOUNT);
     }
 
     /**
@@ -66,7 +65,7 @@ public class TransactionService {
             account.setBalance(account.getBalance() + depositDto.getAmount());
             return "입금완료";
         }
-        throw new InvalidAccountException(ErrorCode.INVALID_ACCOUNT);
+        throw new NotFoundAccountException(ErrorCode.INVALID_ACCOUNT);
     }
 
     /**
@@ -95,7 +94,7 @@ public class TransactionService {
             account.setBalance(account.getBalance()-withdrawalDto.getAmount());
             return "출금완료";
         }
-        throw new InvalidAccountException(ErrorCode.INVALID_ACCOUNT);
+        throw new NotFoundAccountException(ErrorCode.INVALID_ACCOUNT);
     }
 
     /**
@@ -142,7 +141,7 @@ public class TransactionService {
             recipientAccount.setBalance(recipientAccount.getBalance() + transferDto.getAmount());
             return "송금완료";
         }
-        throw new InvalidAccountException(ErrorCode.INVALID_ACCOUNT);
+        throw new NotFoundAccountException(ErrorCode.INVALID_ACCOUNT);
     }
 
     /**

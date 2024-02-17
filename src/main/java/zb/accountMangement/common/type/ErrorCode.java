@@ -10,6 +10,8 @@ public enum ErrorCode {
     INVALID_TOKEN("토큰이 유효하지 않습니다."),
     EXPIRED_TOKEN("만료된 토큰입니다."),
 
+    FAILED_VALIDATION("인증에 실패하였습니다"),
+
     // user
     INVALID_NAME_FORMAT("입력값의 형식이 올바르지 않습니다."),
     USER_NOT_EXIST("해당 사용자가 존재하지 않습니다."),

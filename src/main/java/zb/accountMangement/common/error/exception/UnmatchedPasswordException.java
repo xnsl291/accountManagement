@@ -1,14 +1,14 @@
-package zb.accountMangement.common.exception;
+package zb.accountMangement.common.error.exception;
 
 import lombok.Getter;
 import zb.accountMangement.common.type.ErrorCode;
 
 @Getter
-public class InvalidAccountException extends RuntimeException {
+public class UnmatchedPasswordException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public InvalidAccountException(ErrorCode errorCode) {
+    public UnmatchedPasswordException(ErrorCode errorCode) {
         super(errorCode.getDescription());
         this.errorCode = getErrorCode();
     }

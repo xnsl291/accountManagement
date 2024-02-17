@@ -8,7 +8,7 @@ import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
-import zb.accountMangement.common.exception.*;
+import zb.accountMangement.common.error.exception.*;
 import zb.accountMangement.common.util.RedisUtil;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.*;
@@ -146,9 +146,9 @@ public class AuthenticationService {
       throw new UnmatchedPasswordException(ErrorCode.UNMATCHED_PASSWORD);
 
     if(member.getRole().equals(RoleType.WITHDRAWN))
-      throw new UnauthorizedMemberAccessException(ErrorCode.WITHDRAWN_USER);
+      throw new NotFoundUserException(ErrorCode.WITHDRAWN_USER);
     if(member.getRole().equals(RoleType.PENDING))
-      throw new UnauthorizedMemberAccessException(ErrorCode.PENDING_USER);
+      throw new NotFoundUserException(ErrorCode.PENDING_USER);
 
     String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), member.getPhoneNumber(), member.getRole());
     String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(),member.getPhoneNumber(), member.getRole());
