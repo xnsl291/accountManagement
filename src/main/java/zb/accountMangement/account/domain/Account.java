@@ -31,7 +31,7 @@ public class Account {
   private String accountNumber;
 
   @Builder.Default
-  private long amount =0;
+  private long balance =0;
 
   @Enumerated(EnumType.STRING)
   @Builder.Default
@@ -41,4 +41,11 @@ public class Account {
   private LocalDateTime createdAt;
 
   private LocalDateTime deletedAt;
+
+  public boolean isExistsAccount() {
+    return status.equals(AccountStatus.EXISTS);
+  }
+  public boolean isDeletedAccount() {
+    return status.equals(AccountStatus.DELETED);
+  }
 }

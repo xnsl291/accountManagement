@@ -3,23 +3,26 @@ package zb.accountMangement.member.dto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
 @Builder
 public class SignUpDto {
 
-  @NotNull
+  @NotBlank
   private String name;
 
-  @NotNull
+  @NotBlank
+  @Pattern(regexp = "^01([0-9])[ -.]?([0-9]{3,4})[ -.]?([0-9]{4})$", message = "핸드폰 번호 포맷이 일치하지 않습니다")
   private String phoneNumber;
 
-  @NotNull
+  @NotBlank
   private String password; //로그인 패스워드
 
-  @NotNull
+  @NotBlank
   private String initialAccountPassword; //초기 생성되는 계좌 비밀번호
 
 }

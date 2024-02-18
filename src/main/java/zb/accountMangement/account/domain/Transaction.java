@@ -25,14 +25,15 @@ public class Transaction {
 
   private String name;
 
+  @Enumerated(EnumType.STRING)
   private TransactionType type;
 
   private Long amount;
 
   private String memo;
 
-  private Long Balance;
+  private Long balance;  // 거래 후 잔액
 
   @CreatedDate
-  private LocalDateTime TransactedAt;
+  private LocalDateTime transactedAt;
 }

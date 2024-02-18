@@ -1,14 +1,14 @@
-package zb.accountMangement.common.exception;
+package zb.accountMangement.common.error.exception;
 
 import lombok.Getter;
 import zb.accountMangement.common.type.ErrorCode;
 
 @Getter
-public class NotFoundUserException extends RuntimeException {
+public class DuplicatedInfoException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public NotFoundUserException(ErrorCode errorCode) {
+    public DuplicatedInfoException(ErrorCode errorCode) {
         super(errorCode.getDescription());
         this.errorCode = getErrorCode();
     }

@@ -1,14 +1,14 @@
-package zb.accountMangement.common.exception;
+package zb.accountMangement.common.error.exception;
 
 import lombok.Getter;
 import zb.accountMangement.common.type.ErrorCode;
 
 @Getter
-public class OverdrawException extends RuntimeException {
+public class UnauthorizedAccessException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public OverdrawException(ErrorCode errorCode) {
+    public UnauthorizedAccessException(ErrorCode errorCode) {
         super(errorCode.getDescription());
         this.errorCode = getErrorCode();
     }
