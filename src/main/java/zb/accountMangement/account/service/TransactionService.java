@@ -52,6 +52,8 @@ public class TransactionService {
     public String deposit(TransactionDto depositDto) {
         Account account = accountRepository.findById(depositDto.getAccountId())
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+        long recentBalance = account.getBalance() + depositDto.getAmount();
+
         if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
                     .accountId(depositDto.getAccountId())
@@ -59,10 +61,11 @@ public class TransactionService {
                     .amount(depositDto.getAmount())
                     .name("전자입금")
                     .memo(depositDto.getMemo())
+                    .balance(recentBalance)  //거래 후 잔액
                     .build();
 
             transactionRepository.save(transaction);
-            account.setBalance(account.getBalance() + depositDto.getAmount());
+            account.setBalance(recentBalance);
             return "입금완료";
         }
         throw new NotFoundAccountException(ErrorCode.INVALID_ACCOUNT);
@@ -78,6 +81,7 @@ public class TransactionService {
 
         Account account = accountRepository.findById(withdrawalDto.getAccountId())
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+        long recentBalance = account.getBalance() - withdrawalDto.getAmount();
 
         if (account.getBalance() < withdrawalDto.getAmount())
             throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
@@ -89,9 +93,10 @@ public class TransactionService {
                     .amount(withdrawalDto.getAmount())
                     .name("전자출금")
                     .memo(withdrawalDto.getMemo())
+                    .balance(recentBalance)
                     .build();
             transactionRepository.save(transaction);
-            account.setBalance(account.getBalance()-withdrawalDto.getAmount());
+            account.setBalance(recentBalance);
             return "출금완료";
         }
         throw new NotFoundAccountException(ErrorCode.INVALID_ACCOUNT);
@@ -115,6 +120,9 @@ public class TransactionService {
         Member receiver = memberRepository.findById(recipientAccount.getUserId())
                 .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
+        long recentSenderBalance = senderAccount.getBalance() - transferDto.getAmount();
+        long recentRecipientBalance = recipientAccount.getBalance() + transferDto.getAmount();
+
         if (senderAccount.getBalance() < transferDto.getAmount())
             throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
 
@@ -125,6 +133,7 @@ public class TransactionService {
                     .amount(-transferDto.getAmount())
                     .name(receiver.getName()) // 수신자 이름
                     .memo(transferDto.getMemo())
+                    .balance(recentSenderBalance)
                     .build();
             transactionRepository.save(senderTransaction);
 
@@ -134,11 +143,12 @@ public class TransactionService {
                     .amount(transferDto.getAmount())
                     .name(sender.getName()) // 발신자 이름
                     .memo(transferDto.getMemo())
+                    .balance(recentRecipientBalance)
                     .build();
             transactionRepository.save(recipientTransaction);
 
-            senderAccount.setBalance(senderAccount.getBalance() - transferDto.getAmount());
-            recipientAccount.setBalance(recipientAccount.getBalance() + transferDto.getAmount());
+            senderAccount.setBalance(recentSenderBalance);
+            recipientAccount.setBalance(recentRecipientBalance);
             return "송금완료";
         }
         throw new NotFoundAccountException(ErrorCode.INVALID_ACCOUNT);
@@ -167,7 +177,7 @@ public class TransactionService {
                 .amount(transaction.getAmount())
                 .name(transaction.getName())
                 .memo(transaction.getMemo())
-                .TransactedAt(transaction.getTransactedAt())
+                .transactedAt(transaction.getTransactedAt())
                 .build();
     }
 }

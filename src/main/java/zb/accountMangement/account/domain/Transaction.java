@@ -32,8 +32,8 @@ public class Transaction {
 
   private String memo;
 
-//  private Long Balance;  // 거래후잔액?
+  private Long balance;  // 거래 후 잔액
 
   @CreatedDate
-  private LocalDateTime TransactedAt;
+  private LocalDateTime transactedAt;
 }

@@ -26,5 +26,5 @@ public class TransactionDto {
   private String memo;
 
   @CreatedDate
-  private LocalDateTime TransactedAt;
+  private LocalDateTime transactedAt;
 }
