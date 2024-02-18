@@ -37,7 +37,7 @@ public class AccountService {
     /**
      * 계좌 개설
      * @param userId - 사용자 ID
-     * @param accountManagementDto
+     * @param accountManagementDto - 계좌 정보 dto (계좌별명, 계좌 PW)
      * @return Account
      */
     @Transactional
@@ -62,7 +62,7 @@ public class AccountService {
     }
 
     /**
-     * 계좌 정보 조회 : accountStatus가 EXISTS, PENDING인 계좌 조회 가능
+     * 계좌 정보 조회 - accountStatus가 EXISTS, PENDING인 계좌 조회 가능
      * @param accountId - 계좌 ID
      * @return Account
      */
@@ -79,7 +79,7 @@ public class AccountService {
     /**
      * 계좌 정보 수정
      * @param accountId - 계좌 ID
-     * @param accountManagementDto
+     * @param accountManagementDto - 계좌 정보 dto (계좌별명, 계좌 PW)
      * @return Account
      */
     @Transactional

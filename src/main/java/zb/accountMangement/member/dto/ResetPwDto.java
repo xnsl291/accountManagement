@@ -8,7 +8,6 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @Setter
 public class ResetPwDto {
-  private String token;
 
   @NotBlank
   private String inputCode;

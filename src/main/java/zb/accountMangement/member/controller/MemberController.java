@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import zb.accountMangement.common.util.ValidationService;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.service.MemberService;
@@ -17,29 +18,35 @@ import javax.validation.constraints.Min;
 @RequestMapping("/api/member")
 public class MemberController {
   private final MemberService memberService;
+  private final ValidationService validationService;
 
-  // TODO : 토큰 발급 이후 회원을 토큰으로 확인하는 방식으로 변경
   /**
    * 회원 정보 열람 기능
+   * @param token - 토큰
    * @param userId - id
    * @return Member
    */
   @GetMapping("/{user_id}")
   public ResponseEntity<Member> getUserInfo(
+          @RequestHeader(value = "Authorization") String token,
           @PathVariable("user_id") @Min(1) Long userId  ){
+    validationService.validTokenNUserId(token,userId);
     return ResponseEntity.ok().body(memberService.getUserInfo(userId));
   }
 
   /**
    * 회원 정보 수정
+   * @param token - 토큰
    * @param userId - id
-   * @param updateUserDto - 수정할 정보
+   * @param updateUserDto - 사용자 정보수정 dto (이름, 핸드폰번호, 로그인 PW)
    * @return "수정완료"
    */
   @PatchMapping("/{user_id}")
   public ResponseEntity<Member> updateUserInfo(
+      @RequestHeader(value = "Authorization") String token,
       @PathVariable("user_id") @Min(1) long userId,
       @RequestBody @Valid UpdateUserDto updateUserDto){
+    validationService.validTokenNUserId(token,userId);
     return ResponseEntity.ok().body(memberService.updateUserInfo(userId, updateUserDto));
   }
 }

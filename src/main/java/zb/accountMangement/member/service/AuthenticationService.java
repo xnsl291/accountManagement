@@ -31,10 +31,11 @@ public class AuthenticationService {
 
   /**
    * 회원가입
-   * @param signUpDto
+   * @param token - 토큰
+   * @param signUpDto - 회원가입 dto (이름, 핸드폰번호, 로그인 PW, 초기계좌 PW)
    */
   @Transactional
-  public void signUp(SignUpDto signUpDto){
+  public void signUp(String token, SignUpDto signUpDto){
     String phoneNumber = convert2NumericString(signUpDto.getPhoneNumber());
 
     // 이름 유효성 검사
@@ -49,7 +50,7 @@ public class AuthenticationService {
         });
 
     // 핸드폰 인증번호 발송
-    sendMessageService.sendVerificationMessage(phoneNumber);
+    sendMessageService.sendVerificationMessage(token, phoneNumber);
 
     // 저장
     Member member = Member.builder()
@@ -84,36 +85,37 @@ public class AuthenticationService {
 
   /**
    * 비밀번호 재설정 요청
+   * @param token - 토큰
    * @param userId - id
-   * @param findUserInfoDto
+   * @param findUserInfoDto - 회원정보 조회 dto (이름, 핸드폰번호)
    * @return "인증 메세지 발송 완료"
    */
-  public String requestResetPw(Long userId, FindUserInfoDto findUserInfoDto) {
+  public String requestResetPw(String token, Long userId, FindUserInfoDto findUserInfoDto) {
       Member member = memberRepository.findById(userId)
         .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
-      Member dtoMember = memberRepository.findByPhoneNumber(findUserInfoDto.getPhone())
+      Member dtoMember = memberRepository.findByPhoneNumber(findUserInfoDto.getPhoneNumber())
           .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
       if (!member.getId().equals(dtoMember.getId())) {
         throw new UnmatchedUserException(ErrorCode.UNMATCHED_USER);
       }
 
-      return sendMessageService.sendVerificationMessage(findUserInfoDto.getPhone());
+      return sendMessageService.sendVerificationMessage(token, findUserInfoDto.getPhoneNumber());
   }
 
   /**
    * 비밀번호 재설정
    * @param userId - id
-   * @param resetPwDto
+   * @param resetPwDto - 비밀번호 재설정 dto (인증번호, 새로운 PW)
    * @return "비밀번호 재설정 완료"
    */
   @Transactional
-  public String verifyResetPw(Long userId, ResetPwDto resetPwDto) {
+  public String verifyResetPw(String token, Long userId, ResetPwDto resetPwDto) {
     Member member = memberRepository.findById(userId)
         .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
-    SmsVerificationDto info = redisUtil.getMsgVerificationInfo(resetPwDto.getToken());
+    SmsVerificationDto info = redisUtil.getMsgVerificationInfo(token);
 
     if (info == null)
       throw new NotFoundUserException(ErrorCode.USER_NOT_EXIST);
@@ -127,7 +129,7 @@ public class AuthenticationService {
       member.setPassword(resetPwDto.getNewPassword());
 
       // 인증 정보 삭제
-      redisUtil.deleteMsgVerificationInfo(resetPwDto.getToken());
+      redisUtil.deleteMsgVerificationInfo(token);
     } else
         throw new UnmatchedCodeException(ErrorCode.UNMATCHED_VERIFICATION_CODE);
 
@@ -136,7 +138,7 @@ public class AuthenticationService {
 
   /**
    * 로그인 기능
-   * @param signInDto
+   * @param signInDto - 로그인 dto (핸드폰번호, 로그인 PW)
    * @return token - 토큰
    */
   public JwtToken signIn(SignInDto signInDto) {

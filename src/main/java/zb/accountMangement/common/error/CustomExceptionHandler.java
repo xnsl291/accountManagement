@@ -85,4 +85,9 @@ public class CustomExceptionHandler {
     public ResponseEntity<ErrorCode> handleUnmatchedUserException(UnmatchedUserException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getErrorCode());
     }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<ErrorCode> handleUnauthorizedMemberAccessException(UnauthorizedAccessException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getErrorCode());
+    }
 }

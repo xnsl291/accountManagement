@@ -45,7 +45,7 @@ public class TransactionService {
 
     /**
      * 입금
-     * @param depositDto - TransactionDto
+     * @param depositDto - 계좌거래 dto (계좌 ID, 이름, 금액, 메모, 거래일시)
      * @return "입금완료"
      */
     @Transactional
@@ -70,7 +70,7 @@ public class TransactionService {
 
     /**
      * 출금
-     * @param withdrawalDto - TransactionDto
+     * @param withdrawalDto - 계좌거래 dto (계좌 ID, 이름, 금액, 메모, 거래일시)
      * @return "출금완료"
      */
     @Transactional
@@ -99,7 +99,7 @@ public class TransactionService {
 
     /**
      * 송금
-     * @param transferDto - TransactionDto
+     * @param transferDto - 계좌거래 dto (계좌 ID, 이름, 금액, 메모, 거래일시)
      * @return "송금완료"
      */
     @Transactional
