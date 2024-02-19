@@ -14,17 +14,17 @@ import java.time.LocalDateTime;
 @Builder
 public class TransactionDto {
 
-  @NotNull
-  private Long accountId;
+    @NotNull
+    private Long accountId;
 
-  @NotBlank
-  private String name;
+    @NotBlank
+    private String name;
 
-  @NotBlank
-  private Long amount;
+    @NotBlank
+    private Double amount;
 
-  private String memo;
+    private String memo;
 
-  @CreatedDate
-  private LocalDateTime transactedAt;
+    @CreatedDate
+    private LocalDateTime transactedAt;
 }

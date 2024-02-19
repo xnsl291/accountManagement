@@ -10,7 +10,7 @@ import zb.accountMangement.account.dto.TransactionDto;
 import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.repository.TransactionRepository;
 import zb.accountMangement.account.type.TransactionType;
-import zb.accountMangement.common.error.exception.OverdrawException;
+import zb.accountMangement.common.error.exception.InsufficientBalanceException;
 import zb.accountMangement.common.error.exception.NotFoundAccountException;
 import zb.accountMangement.common.error.exception.NotFoundUserException;
 import zb.accountMangement.common.type.ErrorCode;
@@ -52,7 +52,7 @@ public class TransactionService {
     public String deposit(TransactionDto depositDto) {
         Account account = accountRepository.findById(depositDto.getAccountId())
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        long recentBalance = account.getBalance() + depositDto.getAmount();
+        double recentBalance = account.getBalance() + depositDto.getAmount();
 
         if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
@@ -81,10 +81,10 @@ public class TransactionService {
 
         Account account = accountRepository.findById(withdrawalDto.getAccountId())
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        long recentBalance = account.getBalance() - withdrawalDto.getAmount();
+        double recentBalance = account.getBalance() - withdrawalDto.getAmount();
 
         if (account.getBalance() < withdrawalDto.getAmount())
-            throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
+            throw new InsufficientBalanceException(ErrorCode.EXCEED_BALANCE);
 
         if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
@@ -120,11 +120,11 @@ public class TransactionService {
         Member receiver = memberRepository.findById(recipientAccount.getUserId())
                 .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
-        long recentSenderBalance = senderAccount.getBalance() - transferDto.getAmount();
-        long recentRecipientBalance = recipientAccount.getBalance() + transferDto.getAmount();
+        double recentSenderBalance = senderAccount.getBalance() - transferDto.getAmount();
+        double recentRecipientBalance = recipientAccount.getBalance() + transferDto.getAmount();
 
         if (senderAccount.getBalance() < transferDto.getAmount())
-            throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
+            throw new InsufficientBalanceException(ErrorCode.EXCEED_BALANCE);
 
         if (senderAccount.isExistsAccount() && recipientAccount.isExistsAccount()){
             Transaction senderTransaction = Transaction.builder()
