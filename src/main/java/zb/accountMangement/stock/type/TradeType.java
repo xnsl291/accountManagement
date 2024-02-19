@@ -1,5 +1,5 @@
 package zb.accountMangement.stock.type;
 
 public enum TradeType {
-  BUY, SELL
+  BUY, SELL,TRANSFER
 }

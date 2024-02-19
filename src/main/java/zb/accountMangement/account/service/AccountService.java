@@ -35,6 +35,26 @@ public class AccountService {
   }
 
     /**
+     * id를 이용한 계좌정보 열람
+     * @param accountId - 계좌 ID
+     * @return Account
+     */
+    public Account getAccountById(Long accountId){
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+    }
+
+    /**
+     * 계좌번호를 이용한 계좌정보 열람
+     * @param accountNumber - 계좌번호
+     * @return Account
+     */
+    public Account getAccountByNumber(String accountNumber){
+        return accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+    }
+
+    /**
      * 계좌 개설
      * @param userId - 사용자 ID
      * @param accountManagementDto - 계좌 정보 dto (계좌별명, 계좌 PW)
@@ -67,12 +87,9 @@ public class AccountService {
      * @return Account
      */
     public Account getAccountInfo(Long accountId) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-
+        Account account = getAccountById(accountId);
         if (account.isDeletedAccount())
             throw new NotFoundAccountException(ErrorCode.DELETED_ACCOUNT);
-
         return account;
     }
 
@@ -84,8 +101,7 @@ public class AccountService {
      */
     @Transactional
     public Account updateAccount(Long accountId, AccountManagementDto accountManagementDto) {
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+        Account account = getAccountById(accountId);
 
         if (account.isExistsAccount()) {
             account.setNickname(accountManagementDto.getNickname());
@@ -107,11 +123,9 @@ public class AccountService {
     @Transactional
     public Boolean deleteAccount(Long accountId) {
         boolean result = false;
+        Account account = getAccountById(accountId);
 
-        Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-
-        List<Account> userAccounts = accountRepository.findByUserId(account.getUserId());
+        List<Account> userAccounts = getAllAccounts(account.getUserId());
 
         // 사용자가 2개 이상의 계좌를 가지고 있어야 삭제 가능
         if( account.isExistsAccount() && userAccounts.size() >= 2 ) {

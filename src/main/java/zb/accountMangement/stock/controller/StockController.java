@@ -38,6 +38,11 @@ public class StockController {
         return ResponseEntity.ok().body(stockService.sellStock(sellStockDto));
     }
 
+    @PostMapping("/transfer")
+    public ResponseEntity<Boolean> transferStock(@Valid @RequestBody TransferStockDto transferStockDto){
+        return ResponseEntity.ok().body(stockService.transferStock(transferStockDto));
+    }
+
     /**
      * 계좌 잔고 조회
      * @param accountId - 계좌  ID
@@ -51,10 +56,21 @@ public class StockController {
     /**
      * 거래내역 조회
      * @param accountId - 계좌 ID
-     * @param dateDto - 조회할 날짜, 월
      * @return 거래내역
      */
     @GetMapping("/{account_id}/history")
+    public ResponseEntity<List<Trading>> getTradeHistory(
+            @Validated @PathVariable("account_id") Long accountId){
+        return ResponseEntity.ok().body(stockService.getTradeHistory(accountId));
+    }
+
+    /**
+     * 거래내역 조회 + 날짜 필터링
+     * @param accountId - 계좌 ID
+     * @param dateDto - 조회할 날짜, 월
+     * @return 거래내역
+     */
+    @GetMapping("/{account_id}/history/")
     public ResponseEntity<List<Trading>> getTradeHistory(
             @Validated @PathVariable("account_id") Long accountId,
             @Valid @ModelAttribute DateDto dateDto){
