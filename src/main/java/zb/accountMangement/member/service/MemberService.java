@@ -16,13 +16,23 @@ public class MemberService {
   private final MemberRepository memberRepository;
 
   /**
-   * 회원 정보 열람
+   * id를 이용한 회원 정보 열람
    * @param userId - id
    * @return Member
    */
-  public Member getUserInfo(long userId) {
+  public Member getUserById(long userId) {
     return memberRepository.findById(userId).orElseThrow(
         () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+  }
+
+  /**
+   * 핸드폰번호를 이용한 회원 정보 열람
+   * @param phoneNumber - 핸드폰번호
+   * @return Member
+   */
+  public Member getUserByPhoneNumber(String phoneNumber) {
+    return memberRepository.findByPhoneNumber(phoneNumber).orElseThrow(
+            () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
   }
 
   /**
@@ -33,9 +43,7 @@ public class MemberService {
    */
   @Transactional
   public Member updateUserInfo(long userId, UpdateUserDto updateUserDto) {
-    Member member = memberRepository.findById(userId).orElseThrow(
-        () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
-
+      Member member = getUserById(userId);
       member.setName(updateUserDto.getName());
       member.setPassword(updateUserDto.getPassword());
       member.setPhoneNumber(updateUserDto.getPhoneNumber());

@@ -31,7 +31,7 @@ public class MemberController {
           @RequestHeader(value = "Authorization") String token,
           @PathVariable("user_id") @Min(1) Long userId  ){
     validationService.validTokenNUserId(token,userId);
-    return ResponseEntity.ok().body(memberService.getUserInfo(userId));
+    return ResponseEntity.ok().body(memberService.getUserById(userId));
   }
 
   /**

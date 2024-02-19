@@ -4,11 +4,11 @@ import lombok.Getter;
 import zb.accountMangement.common.type.ErrorCode;
 
 @Getter
-public class OverdrawException extends RuntimeException {
+public class InsufficientStockException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public OverdrawException(ErrorCode errorCode) {
+    public InsufficientStockException(ErrorCode errorCode) {
         super(errorCode.getDescription());
         this.errorCode = getErrorCode();
     }

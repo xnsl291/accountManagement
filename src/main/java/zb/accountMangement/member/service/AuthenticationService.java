@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthenticationService {
+  private final MemberService memberService;
   private final MemberRepository memberRepository;
   private final JwtTokenProvider jwtTokenProvider;
   private final SendMessageService sendMessageService;
@@ -75,8 +76,7 @@ public class AuthenticationService {
    */
   @Transactional
   public String deleteUser(long userId){
-    Member member = memberRepository.findById(userId).orElseThrow(
-            () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+    Member member = memberService.getUserById(userId);
 
     member.setRole(RoleType.WITHDRAWN);
     member.setDeletedAt(LocalDateTime.now());
@@ -91,11 +91,8 @@ public class AuthenticationService {
    * @return "인증 메세지 발송 완료"
    */
   public String requestResetPw(String token, Long userId, FindUserInfoDto findUserInfoDto) {
-      Member member = memberRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
-
-      Member dtoMember = memberRepository.findByPhoneNumber(findUserInfoDto.getPhoneNumber())
-          .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+      Member member = memberService.getUserById(userId);
+      Member dtoMember = memberService.getUserByPhoneNumber(findUserInfoDto.getPhoneNumber());
 
       if (!member.getId().equals(dtoMember.getId())) {
         throw new UnmatchedUserException(ErrorCode.UNMATCHED_USER);
@@ -112,8 +109,7 @@ public class AuthenticationService {
    */
   @Transactional
   public String verifyResetPw(String token, Long userId, ResetPwDto resetPwDto) {
-    Member member = memberRepository.findById(userId)
-        .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+    Member member = memberService.getUserById(userId);
 
     SmsVerificationDto info = redisUtil.getMsgVerificationInfo(token);
 
@@ -142,8 +138,7 @@ public class AuthenticationService {
    * @return token - 토큰
    */
   public JwtToken signIn(SignInDto signInDto) {
-    Member member = memberRepository.findByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()))
-            .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+    Member member = memberService.getUserByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()));
 
     // 비밀번호 일치여부 확인
     if (!passwordEncoder.matches(signInDto.getPassword(), member.getPassword()))

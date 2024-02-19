@@ -7,15 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.domain.Transaction;
 import zb.accountMangement.account.dto.TransactionDto;
-import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.repository.TransactionRepository;
 import zb.accountMangement.account.type.TransactionType;
-import zb.accountMangement.common.error.exception.OverdrawException;
+import zb.accountMangement.common.error.exception.InsufficientBalanceException;
 import zb.accountMangement.common.error.exception.NotFoundAccountException;
-import zb.accountMangement.common.error.exception.NotFoundUserException;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.domain.Member;
-import zb.accountMangement.member.repository.MemberRepository;
+import zb.accountMangement.member.service.MemberService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,8 +23,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @Slf4j
 public class TransactionService {
-    private final AccountRepository accountRepository;
-    private final MemberRepository memberRepository;
+    private final AccountService accountService;
+    private final MemberService memberService;
     private final TransactionRepository transactionRepository;
     /**
      * 계좌 소유주 확인
@@ -34,12 +32,10 @@ public class TransactionService {
      * @return 사용자 이름
      */
     public String validateRecipient(String accountNumber) {
-        Account account = accountRepository.findByAccountNumber(accountNumber)
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+        Account account = accountService.getAccountByNumber(accountNumber);
 
         if (!account.isDeletedAccount())
-            return memberRepository.findById(account.getUserId()).orElseThrow(
-                () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST)).getName();
+            return memberService.getUserById(account.getUserId()).getName();
         throw new NotFoundAccountException(ErrorCode.DELETED_ACCOUNT);
     }
 
@@ -50,9 +46,8 @@ public class TransactionService {
      */
     @Transactional
     public String deposit(TransactionDto depositDto) {
-        Account account = accountRepository.findById(depositDto.getAccountId())
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        long recentBalance = account.getBalance() + depositDto.getAmount();
+        Account account = accountService.getAccountById(depositDto.getAccountId()) ;
+        double recentBalance = account.getBalance() + depositDto.getAmount();
 
         if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
@@ -78,13 +73,11 @@ public class TransactionService {
      */
     @Transactional
     public String withdrawal(TransactionDto withdrawalDto) {
-
-        Account account = accountRepository.findById(withdrawalDto.getAccountId())
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        long recentBalance = account.getBalance() - withdrawalDto.getAmount();
+        Account account = accountService.getAccountById(withdrawalDto.getAccountId()) ;
+        double recentBalance = account.getBalance() - withdrawalDto.getAmount();
 
         if (account.getBalance() < withdrawalDto.getAmount())
-            throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
+            throw new InsufficientBalanceException(ErrorCode.EXCEED_BALANCE);
 
         if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()
@@ -109,22 +102,17 @@ public class TransactionService {
      */
     @Transactional
     public String transfer(Long senderAccountId, Long receiverAccountId, TransactionDto transferDto) {
+        Account senderAccount = accountService.getAccountById(senderAccountId) ;
+        Account recipientAccount = accountService.getAccountById(receiverAccountId) ;
 
-        Account senderAccount = accountRepository.findById(senderAccountId)
-                .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
-        Account recipientAccount = accountRepository.findById(receiverAccountId)
-                        .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
+        Member sender = memberService.getUserById(senderAccount.getUserId());
+        Member receiver = memberService.getUserById(recipientAccount.getUserId());
 
-        Member sender = memberRepository.findById(senderAccount.getUserId())
-                .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
-        Member receiver = memberRepository.findById(recipientAccount.getUserId())
-                .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
-
-        long recentSenderBalance = senderAccount.getBalance() - transferDto.getAmount();
-        long recentRecipientBalance = recipientAccount.getBalance() + transferDto.getAmount();
+        double recentSenderBalance = senderAccount.getBalance() - transferDto.getAmount();
+        double recentRecipientBalance = recipientAccount.getBalance() + transferDto.getAmount();
 
         if (senderAccount.getBalance() < transferDto.getAmount())
-            throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
+            throw new InsufficientBalanceException(ErrorCode.EXCEED_BALANCE);
 
         if (senderAccount.isExistsAccount() && recipientAccount.isExistsAccount()){
             Transaction senderTransaction = Transaction.builder()
@@ -160,7 +148,7 @@ public class TransactionService {
      * @return 거래내역 리스트
      */
     public List<TransactionDto> getTransactionsByAccountId(Long accountId) {
-        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+        List<Transaction> transactions = transactionRepository.findByAccountIdOrderByTransactedAtDesc(accountId);
         return transactions.stream()
                 .map(this::mapToTransactionDto)
                 .collect(Collectors.toList());

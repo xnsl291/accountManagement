@@ -66,8 +66,18 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(httpStatus).body(errorCode);
     }
 
-    @ExceptionHandler(OverdrawException.class)
-    public ResponseEntity<ErrorCode> handleOverdrawException(OverdrawException ex) {
+    @ExceptionHandler(NotFoundStockException.class)
+    public ResponseEntity<ErrorCode> handleNotFoundStockException(NotFoundStockException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getErrorCode());
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ErrorCode> handleInsufficientBalanceException(InsufficientBalanceException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getErrorCode());
+    }
+
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorCode> handleInsufficientStockException(InsufficientStockException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getErrorCode());
     }
 
