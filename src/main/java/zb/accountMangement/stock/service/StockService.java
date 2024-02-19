@@ -187,7 +187,12 @@ public class StockService {
         StockBalance senderStockBalance = getStockBalanceByAccountIdAndStockId(transferStockDto.getSenderAccountId(), transferStockDto.getStockId());
         Account senderAccount = accountService.getAccountById(transferStockDto.getSenderAccountId());
 
-        double transferFee = calculateTransferFee(transferStockDto.getStockId() , transferStockDto.getQuantity());
+        Long senderId = senderAccount.getId();
+        Long receiverId = accountService.getAccountById(transferStockDto.getReceiverAccountId()).getUserId();
+
+        // 본인 계좌에 이체할 경우 수수료 X
+        double transferFee = senderId.equals(receiverId) ?
+                calculateTransferFee(transferStockDto.getStockId() , transferStockDto.getQuantity()) : 0 ;
 
         if (senderAccount.getBalance() < transferFee)
             throw new InsufficientBalanceException(ErrorCode.EXCEED_BALANCE);
@@ -323,8 +328,4 @@ public class StockService {
         Stock stock = getStockById(stockBalance.getStockId());
         return (stock.getCurrentPrice() - stockBalance.getAvgPrice()) * stockBalance.getQuantity();
     }
-
-
-
-
 }
