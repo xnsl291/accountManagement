@@ -5,21 +5,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.repository.AccountRepository;
-import zb.accountMangement.common.error.exception.InsufficientBalanceException;
-import zb.accountMangement.common.error.exception.InsufficientStockException;
-import zb.accountMangement.common.error.exception.NotFoundAccountException;
-import zb.accountMangement.common.error.exception.NotFoundStockException;
+import zb.accountMangement.common.error.exception.*;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.stock.domain.Stock;
 import zb.accountMangement.stock.domain.StockBalance;
 import zb.accountMangement.stock.domain.Trading;
+import zb.accountMangement.stock.dto.DateDto;
 import zb.accountMangement.stock.dto.TradeStockDto;
 import zb.accountMangement.stock.repository.StockBalanceRepository;
 import zb.accountMangement.stock.repository.StockRepository;
 import zb.accountMangement.stock.repository.TradingRepository;
 import zb.accountMangement.stock.type.TradeType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -135,14 +135,48 @@ public class StockService {
         return tradeHistory.isConcluded();
     }
 
-    // 계좌 잔고 조회
-    public String getStockBalance(Long accountId) {
-        return "";
+    /**
+     * 거래내역 조회
+     * @param accountId - 계좌 ID
+     * @param dateDto - 조회할 날짜, 월
+     * @return 거래내역
+     */
+    public List<Trading> getTradeHistory(DateDto dateDto, Long accountId) {
+        LocalDate requestedDate = LocalDate.of(dateDto.getYear(), dateDto.getMonth(), 1);
+
+        // 요청된 날짜가 오늘 이후인지
+        if (requestedDate.isAfter(LocalDate.now()))
+            throw new InvalidInputException(ErrorCode.INVALID_REQUEST_DATE);
+
+        LocalDateTime startDate = LocalDateTime.of(dateDto.getYear(), dateDto.getMonth(), 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1).minusNanos(1); // 월의 마지막 일시
+
+        return tradeHistoryRepository.findByAccountIdAndTradeAtBetweenOrderByTradeAtDesc(accountId, startDate, endDate);
     }
 
-    // 주식 거래내역 조회
-    public String getTradeHistory(Long accountId) {
+    /**
+     * 계좌 잔고 조회
+     * @param accountId - 계좌  ID
+     * @return 현재 보유중인 주식 종목 리스트
+     */
+    public List<StockBalance> getStockBalance(Long accountId) {
+        List<StockBalance> stockBalances = stockBalanceRepository.findByAccountId(accountId);
 
-        return "";
+        if (!stockBalances.isEmpty())
+            // TODO: 스케줄러에 등록해서 STOCK 정보가 업데이트 될 떄 같이 업데이트 되게 변경
+            for (StockBalance stockBalance : stockBalances)
+                stockBalance.setProfitNLoss(calculateProfitLoss(stockBalance));  // 평가손익 업데이트
+        return stockBalances;
+    }
+
+    /**
+     * 평가손익 계산
+     * @param stockBalance - 주식 잔고
+     * @return 평가손익
+     */
+    private Double calculateProfitLoss(StockBalance stockBalance){
+        Stock stock = stockRepository.findById(stockBalance.getId())
+                .orElseThrow(() -> new InsufficientStockException(ErrorCode.INSUFFICIENT_STOCK));
+        return (stock.getCurrentPrice() - stockBalance.getAvgPrice()) * stockBalance.getQuantity();
     }
 }

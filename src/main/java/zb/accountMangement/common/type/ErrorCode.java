@@ -36,6 +36,7 @@ public enum ErrorCode {
     STOCK_NOT_EXIST("일치하는 종목이 없습니다."),
     INSUFFICIENT_STOCK("보유량이 부족합니다"),
     NO_STOCK_BALANCE("보유량이 없습니다"),
+    INVALID_REQUEST_DATE("날짜가 유효하지 않습니다."),
     ;
     private final String description;
 }

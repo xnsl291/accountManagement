@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import zb.accountMangement.stock.domain.StockBalance;
+import zb.accountMangement.stock.domain.Trading;
 import zb.accountMangement.stock.dto.*;
 import zb.accountMangement.stock.service.StockService;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,13 +38,26 @@ public class StockController {
         return ResponseEntity.ok().body(stockService.sellStock(sellStockDto));
     }
 
+    /**
+     * 계좌 잔고 조회
+     * @param accountId - 계좌  ID
+     * @return 현재 보유중인 주식 종목 리스트
+     */
     @GetMapping("/{account_id}/balance")
-    public ResponseEntity<String> getStockBalance(@Validated @PathVariable("account_id")Long accountId){
+    public ResponseEntity<List<StockBalance>> getStockBalance(@Validated @PathVariable("account_id")Long accountId){
         return ResponseEntity.ok().body(stockService.getStockBalance(accountId));
     }
 
+    /**
+     * 거래내역 조회
+     * @param accountId - 계좌 ID
+     * @param dateDto - 조회할 날짜, 월
+     * @return 거래내역
+     */
     @GetMapping("/{account_id}/history")
-    public ResponseEntity<String> getTradeHistory(@Validated @PathVariable("account_id")Long accountId){
-        return ResponseEntity.ok().body(stockService.getTradeHistory(accountId));
+    public ResponseEntity<List<Trading>> getTradeHistory(
+            @Validated @PathVariable("account_id")Long accountId,
+            @Valid @ModelAttribute DateDto dateDto){
+        return ResponseEntity.ok().body(stockService.getTradeHistory(dateDto,accountId));
     }
 }

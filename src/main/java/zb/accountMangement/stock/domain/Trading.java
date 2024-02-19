@@ -20,7 +20,7 @@ public class Trading {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private Long accountId; // account 가 필요해./..?
+  private Long accountId;
 
   private Long stockId;
 
