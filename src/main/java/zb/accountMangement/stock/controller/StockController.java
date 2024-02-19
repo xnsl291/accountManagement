@@ -44,7 +44,7 @@ public class StockController {
      * @return 현재 보유중인 주식 종목 리스트
      */
     @GetMapping("/{account_id}/balance")
-    public ResponseEntity<List<StockBalance>> getStockBalance(@Validated @PathVariable("account_id")Long accountId){
+    public ResponseEntity<List<StockBalance>> getStockBalance(@Validated @PathVariable("account_id") Long accountId){
         return ResponseEntity.ok().body(stockService.getStockBalance(accountId));
     }
 
@@ -56,8 +56,18 @@ public class StockController {
      */
     @GetMapping("/{account_id}/history")
     public ResponseEntity<List<Trading>> getTradeHistory(
-            @Validated @PathVariable("account_id")Long accountId,
+            @Validated @PathVariable("account_id") Long accountId,
             @Valid @ModelAttribute DateDto dateDto){
         return ResponseEntity.ok().body(stockService.getTradeHistory(dateDto,accountId));
+    }
+
+    /**
+     * 주식 현재 시세 조회
+     * @param stockId - 주식 ID
+     * @return 주식 가격
+     */
+    @GetMapping("/{stock_id}")
+    public ResponseEntity<Double> getStockPrice(@Validated @PathVariable("stock_id") Long stockId){
+        return ResponseEntity.ok().body(stockService.getCurrentStockPrice(stockId));
     }
 }

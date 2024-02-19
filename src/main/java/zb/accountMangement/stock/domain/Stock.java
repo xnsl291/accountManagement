@@ -21,5 +21,5 @@ public class Stock {
 
   private String name; // 종목명
 
-  private Long currentPrice ;   //// ??? 현재가 ????
+  private Double currentPrice ;   //// ??? 현재가 ????
 }

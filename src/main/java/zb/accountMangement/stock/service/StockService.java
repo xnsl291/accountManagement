@@ -179,4 +179,15 @@ public class StockService {
                 .orElseThrow(() -> new InsufficientStockException(ErrorCode.INSUFFICIENT_STOCK));
         return (stock.getCurrentPrice() - stockBalance.getAvgPrice()) * stockBalance.getQuantity();
     }
+
+    /**
+     * 주식 현재 시세 조회
+     * @param stockId - 주식 ID
+     * @return 주식 가격
+     */
+    public Double getCurrentStockPrice(Long stockId) {
+        Stock stock = stockRepository.findById(stockId)
+                .orElseThrow(() -> new InsufficientStockException(ErrorCode.INSUFFICIENT_STOCK));
+        return stock.getCurrentPrice();
+    }
 }
