@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.dto.AccountManagementDto;
+import zb.accountMangement.account.dto.SearchAccountDto;
 import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.type.AccountStatus;
 import zb.accountMangement.common.error.exception.NotFoundAccountException;
 import zb.accountMangement.common.type.ErrorCode;
+import zb.accountMangement.member.service.MemberService;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class AccountService {
     private final int ACCOUNT_NUMBER_LENGTH = 14;
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
+    private final MemberService memberService;
     /**
      * 계좌번호 생성
      * @return 계좌번호
@@ -137,10 +139,39 @@ public class AccountService {
         return result;
     }
 
-
     // 전체 계좌 조회
     public List<Account> getAllAccounts(Long userId){
         return accountRepository.findByUserId(userId);
     }
 
+    /**
+     * 계좌 검색
+     * @param accountId - 계좌 Id
+     * @param requesterId - 요구자 ID
+     * @return 계좌정보
+     */
+    public SearchAccountDto searchAccount(Long accountId, Long requesterId) {
+        Account account = getAccountById(accountId);
+        String username = memberService.getUserById(account.getUserId()).getName();
+
+        // 본인의 계좌
+        if (account.getUserId().equals(requesterId)) {
+            return SearchAccountDto.builder()
+                    .accountId(account.getId())
+                    .accountNumber(account.getAccountNumber())
+                    .ownerName(username)
+                    .accountNickname(account.getNickname())
+                    .balance(account.getBalance())
+                    .status(account.getStatus())
+                    .build();
+        }
+        // 타인의 계좌
+        else {
+            return SearchAccountDto.builder()
+                    .accountId(account.getId())
+                    .accountNumber(account.getAccountNumber())
+                    .ownerName(username)
+                    .build();
+        }
+    }
 }

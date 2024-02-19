@@ -148,7 +148,7 @@ public class TransactionService {
      * @return 거래내역 리스트
      */
     public List<TransactionDto> getTransactionsByAccountId(Long accountId) {
-        List<Transaction> transactions = transactionRepository.findByAccountId(accountId);
+        List<Transaction> transactions = transactionRepository.findByAccountIdOrderByTransactedAtDesc(accountId);
         return transactions.stream()
                 .map(this::mapToTransactionDto)
                 .collect(Collectors.toList());

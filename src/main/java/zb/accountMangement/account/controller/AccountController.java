@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.account.domain.Account;
 import zb.accountMangement.account.dto.AccountManagementDto;
+import zb.accountMangement.account.dto.SearchAccountDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.util.ValidationService;
@@ -88,5 +89,18 @@ public class AccountController {
           @PathVariable("user_id")Long userId){
     validationService.validTokenNUserId(token,userId);
     return ResponseEntity.ok().body(accountService.getAllAccounts(userId));
+  }
+
+  /**
+   * 계좌 검색
+   * @param token - 토큰
+   * @param accountId - 검색하고자 하는 계좌 ID
+   * @return 계좌정보
+   */
+  @GetMapping("/search/{account_id}")
+  public ResponseEntity<SearchAccountDto> searchAccounts(
+          @RequestHeader(value = "Authorization") String token,
+          @PathVariable("account_id")Long accountId){
+    return ResponseEntity.ok().body(accountService.searchAccount(accountId,tokenProvider.getId(token)));
   }
 }

@@ -22,6 +22,7 @@ import zb.accountMangement.stock.type.TradeType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -305,7 +306,7 @@ public class StockService {
     }
 
     /**
-     * 계좌 잔고 조회
+     * 계좌 잔고 조회 - 평가손익순으로 정렬
      * @param accountId - 계좌  ID
      * @return 현재 보유중인 주식 종목 리스트
      */
@@ -316,6 +317,9 @@ public class StockService {
             // TODO: 스케줄러에 등록해서 STOCK 정보가 업데이트 될 떄 같이 업데이트 되게 변경
             for (StockBalance stockBalance : stockBalances)
                 stockBalance.setProfitNLoss(calculateProfitLoss(stockBalance));  // 평가손익 업데이트
+
+        //평가손익순으로 정렬
+        stockBalances.sort(Comparator.comparingDouble(StockBalance::getProfitNLoss).reversed());
         return stockBalances;
     }
 

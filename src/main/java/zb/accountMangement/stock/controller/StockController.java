@@ -54,18 +54,7 @@ public class StockController {
     }
 
     /**
-     * 거래내역 조회
-     * @param accountId - 계좌 ID
-     * @return 거래내역
-     */
-    @GetMapping("/{account_id}/history")
-    public ResponseEntity<List<Trading>> getTradeHistory(
-            @Validated @PathVariable("account_id") Long accountId){
-        return ResponseEntity.ok().body(stockService.getTradeHistory(accountId));
-    }
-
-    /**
-     * 거래내역 조회 + 날짜 필터링
+     * 거래내역 조회 - 날짜값을 지정하여 검색가능
      * @param accountId - 계좌 ID
      * @param dateDto - 조회할 날짜, 월
      * @return 거래내역
@@ -73,8 +62,10 @@ public class StockController {
     @GetMapping("/{account_id}/history/")
     public ResponseEntity<List<Trading>> getTradeHistory(
             @Validated @PathVariable("account_id") Long accountId,
-            @Valid @ModelAttribute DateDto dateDto){
-        return ResponseEntity.ok().body(stockService.getTradeHistory(dateDto,accountId));
+            @ModelAttribute @Valid DateDto dateDto) {
+        if (dateDto == null)
+            return ResponseEntity.ok().body(stockService.getTradeHistory(accountId));
+        return ResponseEntity.ok().body(stockService.getTradeHistory(dateDto, accountId));
     }
 
     /**
