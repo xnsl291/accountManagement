@@ -8,7 +8,7 @@ import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
-import zb.accountMangement.common.exception.*;
+import zb.accountMangement.common.error.exception.*;
 import zb.accountMangement.common.service.RedisService;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.*;
@@ -22,11 +22,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthenticationService {
-  private final MemberService memberService;
   private final MemberRepository memberRepository;
   private final JwtTokenProvider jwtTokenProvider;
   private final SendMessageService sendMessageService;
   private final BCryptPasswordEncoder passwordEncoder;
+  private final MemberService memberService;
   private final AccountService accountService;
   private final RedisService redisService;
 
@@ -111,7 +111,7 @@ public class AuthenticationService {
   public String verifyResetPw(String token, Long userId, ResetPwDto resetPwDto) {
     Member member = memberService.getUserById(userId);
 
-    SmsVerificationDto info = redisUtil.getMsgVerificationInfo(token);
+    SmsVerificationDto info = redisService.getMsgVerificationInfo(token);
     if (info == null)
       throw new NotFoundUserException(ErrorCode.USER_NOT_EXIST);
 
@@ -124,7 +124,7 @@ public class AuthenticationService {
       member.setPassword(resetPwDto.getNewPassword());
 
       // 인증 정보 삭제
-      redisUtil.deleteMsgVerificationInfo(token);
+      redisService.deleteMsgVerificationInfo(token);
     } else
         throw new UnmatchedCodeException(ErrorCode.UNMATCHED_VERIFICATION_CODE);
 

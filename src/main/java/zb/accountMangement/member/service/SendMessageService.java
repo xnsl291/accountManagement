@@ -24,10 +24,10 @@ public class SendMessageService {
 
     private final RedisService redisService;
 
-    @Value("${sms.api-key}")
+    @Value("${coolsms.api-key}")
     private String apiKey;
 
-    @Value("${sms.secret-key}")
+    @Value("${coolsms.secret-key}")
     private String secretKey;
 
     @Value("${provider.phone-number}")
@@ -52,7 +52,7 @@ public class SendMessageService {
         params.put("app_version", "test app 1.2");
 
         try {
-            coolsms.send(params);
+            message.send(params);
             //TODO : setMsgVerificationInfo 사용해서 토큰 정보도 함꼐 저장
 //            redisUtil.setMsgVerificationInfo(token, phoneNumber, verificationCode, PHONE_VALID.getTime());
             redisService.setData(phoneNumber,verificationCode, PHONE_VALID.getTime());
@@ -69,7 +69,7 @@ public class SendMessageService {
      * @param smsVerificationDto - 문자인증 dto (인증번호, 핸드폰번호)
      * @return 일치여부
      */
-    public boolean verifyCode(SmsVerificationDto smsVerificationDto) {
+    public boolean verifyCode(String token, SmsVerificationDto smsVerificationDto) {
         //TODO : getMsgVerificationInfo 사용해서 토큰 정보 맞는지 확인. (인증번호 + 토큰 일치해야함)
         SmsVerificationDto info = redisService.getMsgVerificationInfo(senderPhoneNumber);
         if (info==null)

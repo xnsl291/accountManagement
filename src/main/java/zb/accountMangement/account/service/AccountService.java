@@ -20,9 +20,7 @@ import zb.accountMangement.member.service.MemberService;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
-@Transactional(readOnly = true)
 public class AccountService {
 
     private final int ACCOUNT_NUMBER_LENGTH = 14;
