@@ -1,4 +1,4 @@
-package zb.accountMangement.common.exception;
+package zb.accountMangement.common.error.exception;
 
 import lombok.Getter;
 import zb.accountMangement.common.type.ErrorCode;

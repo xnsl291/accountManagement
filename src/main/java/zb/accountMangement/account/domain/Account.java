@@ -17,28 +17,35 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Account {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private Long userId;
+    private Long userId;
 
-  private String nickname;
+    private String nickname;
 
-  private String password;
+    private String password;
 
-  @Column(unique = true)
-  private String accountNumber;
+    @Column(unique = true)
+    private String accountNumber;
 
-  @Builder.Default
-  private long amount =0;
+    @Builder.Default
+    private Double balance = 0.0;
 
-  @Enumerated(EnumType.STRING)
-  @Builder.Default
-  private AccountStatus status = AccountStatus.EXISTS;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AccountStatus status = AccountStatus.EXISTS;
 
-  @CreatedDate
-  private LocalDateTime createdAt;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
-  private LocalDateTime deletedAt;
+    private LocalDateTime deletedAt;
+
+    public boolean isExistsAccount() {
+        return status.equals(AccountStatus.EXISTS);
+    }
+    public boolean isDeletedAccount() {
+        return status.equals(AccountStatus.DELETED);
+    }
 }

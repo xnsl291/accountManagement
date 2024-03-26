@@ -17,22 +17,23 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Transaction {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  private Long accountId;
+    private Long accountId;
 
-  private String name;
+    private String name;
 
-  private TransactionType type;
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
-  private Long amount;
+    private Double amount;
 
-  private String memo;
+    private String memo;
 
-  private Long Balance;
+    private Double balance;  // 거래 후 잔액
 
-  @CreatedDate
-  private LocalDateTime TransactedAt;
+    @CreatedDate
+    private LocalDateTime transactedAt;
 }
