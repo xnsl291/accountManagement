@@ -9,7 +9,7 @@ import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.exception.*;
-import zb.accountMangement.common.util.RedisUtil;
+import zb.accountMangement.common.service.RedisService;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.common.type.ErrorCode;
@@ -25,7 +25,7 @@ public class AuthenticationService {
   private final SendMessageService sendMessageService;
   private final BCryptPasswordEncoder passwordEncoder;
   private final AccountService accountService;
-  private final RedisUtil redisUtil;
+  private final RedisService redisService;
 
   /**
    * 회원가입
@@ -97,7 +97,7 @@ public class AuthenticationService {
     Member member = memberRepository.findById(userId)
         .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
-    SmsVerificationDto info = redisUtil.getMsgVerificationInfo(resetPwDto.getToken());
+    SmsVerificationDto info = redisService.getMsgVerificationInfo(resetPwDto.getToken());
 
     if (info == null)
       throw new NotFoundUserException(ErrorCode.USER_NOT_EXIST);
@@ -112,7 +112,7 @@ public class AuthenticationService {
       memberRepository.save(member);
 
       // 인증 정보 삭제
-      redisUtil.deleteMsgVerificationInfo(resetPwDto.getToken());
+      redisService.deleteMsgVerificationInfo(resetPwDto.getToken());
     } else
       throw new UnmatchedCodeException(ErrorCode.UNMATCHED_VERIFICATION_CODE);
 
@@ -154,8 +154,8 @@ public class AuthenticationService {
     if (jwtTokenProvider.validateToken(token)) {
       String phoneNumber = jwtTokenProvider.getPhoneNumber(token);
 
-      if (redisUtil.getData(phoneNumber) != null) {
-        redisUtil.deleteData(phoneNumber);
+      if (redisService.getData(phoneNumber) != null) {
+        redisService.deleteData(phoneNumber);
       }
       jwtTokenProvider.deleteToken(phoneNumber);
     }

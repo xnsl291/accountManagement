@@ -11,7 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zb.accountMangement.common.util.RedisUtil;
+import zb.accountMangement.common.service.RedisService;
 import zb.accountMangement.member.dto.SmsVerificationDto;
 
 @Service
@@ -20,7 +20,7 @@ import zb.accountMangement.member.dto.SmsVerificationDto;
 @Transactional(readOnly = true)
 public class SendMessageService {
 
-    private final RedisUtil redisUtil;
+    private final RedisService redisService;
 
     @Value("${coolsms.api-key}")
     private String apiKey;
@@ -52,7 +52,7 @@ public class SendMessageService {
             coolsms.send(params);
             //TODO : setMsgVerificationInfo 사용해서 토큰 정보도 함꼐 저장
 //            redisUtil.setMsgVerificationInfo(token, phoneNumber, verificationCode, PHONE_VALID.getTime());
-            redisUtil.setData(phoneNumber,verificationCode, PHONE_VALID.getTime());
+            redisService.setData(phoneNumber,verificationCode, PHONE_VALID.getTime());
         } catch (CoolsmsException e) {
             log.info(e.getMessage());
             throw new RuntimeException(e);
@@ -68,7 +68,7 @@ public class SendMessageService {
      */
     public boolean verifyCode(SmsVerificationDto smsVerificationDto) {
         //TODO : getMsgVerificationInfo 사용해서 토큰 정보 맞는지 확인. (인증번호 + 토큰 일치해야함)
-        SmsVerificationDto info = redisUtil.getMsgVerificationInfo(senderPhoneNumber);
+        SmsVerificationDto info = redisService.getMsgVerificationInfo(senderPhoneNumber);
         return info.getVerificationCode().equals(smsVerificationDto.getVerificationCode());
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import zb.accountMangement.common.exception.InvalidTokenException;
 import zb.accountMangement.common.type.ErrorCode;
-import zb.accountMangement.common.util.RedisUtil;
+import zb.accountMangement.common.service.RedisService;
 import zb.accountMangement.member.type.RoleType;
 
 import javax.crypto.SecretKey;
@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     public static final String ACCESS_TOKEN_KEY = "Access-Token";
     public static final String REFRESH_TOKEN_KEY = "Refresh-Token";
 
-    private final RedisUtil redisUtil;
+    private final RedisService redisService;
 
 
     public String generateAccessToken(Long id, String phoneNumber, RoleType authority) {
@@ -65,13 +65,13 @@ public class JwtTokenProvider {
     }
 
     public void saveRefreshToken(String phoneNumber, String token){
-        redisUtil.setData("RT:"+phoneNumber , token, refreshTokenExpirationTimeInSeconds);
+        redisService.setData("RT:"+phoneNumber , token, refreshTokenExpirationTimeInSeconds);
     }
 
     public void deleteToken(String phoneNumber) {
         String rtKey = "RT:"+phoneNumber;
-        if (redisUtil.getData(rtKey)!=null)
-            redisUtil.deleteData(getPhoneNumber(rtKey));
+        if (redisService.getData(rtKey)!=null)
+            redisService.deleteData(getPhoneNumber(rtKey));
     }
 
     public boolean validateToken(String token) {
