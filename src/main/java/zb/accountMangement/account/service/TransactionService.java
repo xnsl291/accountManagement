@@ -13,6 +13,7 @@ import zb.accountMangement.common.exception.OverdrawException;
 import zb.accountMangement.common.exception.NotFoundAccountException;
 import zb.accountMangement.common.exception.NotFoundUserException;
 import zb.accountMangement.common.type.ErrorCode;
+import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.repository.MemberRepository;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class TransactionService {
 
         if (accountService.isExistAccount(account.getId()))
             return memberRepository.findById(account.getUserId()).orElseThrow(
-                () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST)).getName;
+                () -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST)).getName();
 
         return "";
     }
@@ -56,7 +57,7 @@ public class TransactionService {
                     .build();
 
             transactionRepository.save(transaction);
-            account.setBalance(account.getBalance() + depositDto.getAmount());
+            account.setAmount(account.getAmount() + depositDto.getAmount());
             return "입금완료";
         }
         return "입금실페";
@@ -67,7 +68,7 @@ public class TransactionService {
         Account account = accountRepository.findById(withdrawalDto.getAccountId())
                 .orElseThrow(() -> new NotFoundAccountException(ErrorCode.ACCOUNT_NOT_EXIST));
 
-        if (account.getBalance() < withdrawalDto.getAmount())
+        if (account.getAmount() < withdrawalDto.getAmount())
             throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
 
         if (accountService.isExistAccount(account.getId())) {
@@ -79,7 +80,7 @@ public class TransactionService {
                     .memo(withdrawalDto.getMemo())
                     .build();
             transactionRepository.save(transaction);
-            account.setBalance(account.getBalance()-withdrawalDto.getAmount());
+            account.setAmount(account.getAmount()-withdrawalDto.getAmount());
             return "출금완료";
         }
         return "출금실패";
@@ -97,7 +98,7 @@ public class TransactionService {
         Member receiver = memberRepository.findById(recipientAccount.getUserId())
                 .orElseThrow(() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
 
-        if (senderAccount.getBalance() < transferDto.getAmount())
+        if (senderAccount.getAmount() < transferDto.getAmount())
             throw new OverdrawException(ErrorCode.EXCEED_BALANCE);
 
         if (accountService.isExistAccount(senderAccount.getId()) && accountService.isExistAccount(recipientAccount.getId()) ) {
@@ -119,8 +120,8 @@ public class TransactionService {
                     .build();
             transactionRepository.save(recipientTransaction);
 
-            senderAccount.setBalance(senderAccount.getBalance() - transferDto.getAmount());
-            recipientAccount.setBalance(recipientAccount.getBalance() + transferDto.getAmount());
+            senderAccount.setAmount(senderAccount.getAmount() - transferDto.getAmount());
+            recipientAccount.setAmount(recipientAccount.getAmount() + transferDto.getAmount());
             return "송금완료";
         }
         return "송금실패";
