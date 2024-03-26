@@ -13,7 +13,9 @@ import zb.accountMangement.common.error.exception.InsufficientBalanceException;
 import zb.accountMangement.common.error.exception.NotFoundAccountException;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.domain.Member;
+import zb.accountMangement.member.repository.MemberRepository;
 import zb.accountMangement.member.service.MemberService;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +35,6 @@ public class TransactionService {
      */
     public String validateRecipient(String accountNumber) {
         Account account = accountService.getAccountByNumber(accountNumber);
-
         if (!account.isDeletedAccount())
             return memberService.getUserById(account.getUserId()).getName();
         throw new NotFoundAccountException(ErrorCode.DELETED_ACCOUNT);
@@ -75,9 +76,6 @@ public class TransactionService {
     public String withdrawal(TransactionDto withdrawalDto) {
         Account account = accountService.getAccountById(withdrawalDto.getAccountId()) ;
         double recentBalance = account.getBalance() - withdrawalDto.getAmount();
-
-        if (account.getBalance() < withdrawalDto.getAmount())
-            throw new InsufficientBalanceException(ErrorCode.EXCEED_BALANCE);
 
         if (account.isExistsAccount()) {
             Transaction transaction = Transaction.builder()

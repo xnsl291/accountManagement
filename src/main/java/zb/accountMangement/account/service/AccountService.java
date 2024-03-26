@@ -20,7 +20,6 @@ import zb.accountMangement.member.service.MemberService;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
 public class AccountService {
 

@@ -27,7 +27,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_EXIST("계좌 정보가 존재하지 않습니다."),
     DELETED_ACCOUNT("삭제된 계좌입니다."),
     PENDING_ACCOUNT("거래정지된 계좌입니다."),
-    EXCEED_BALANCE("잔액이 초과되었습니다."),
+    EXCEED_BALANCE("잔액을 초과할 수 없습니다"),
     INVALID_ACCOUNT("거래할 수 없는 계좌 입니다."),
 
     MISMATCH_ACCOUNT_OWNER("계좌 소유자와 유저 정보가 일치하지 않습니다."),
