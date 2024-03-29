@@ -2,7 +2,7 @@ package zb.accountMangement.common.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import zb.accountMangement.account.domain.Account;
+import zb.accountMangement.account.model.entity.Account;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.error.exception.NotFoundUserException;

@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zb.accountMangement.account.domain.Account;
-import zb.accountMangement.account.domain.Transaction;
+import zb.accountMangement.account.model.entity.Account;
+import zb.accountMangement.account.model.entity.Transaction;
 import zb.accountMangement.account.dto.TransactionDto;
 import zb.accountMangement.account.repository.TransactionRepository;
-import zb.accountMangement.account.type.TransactionType;
+import zb.accountMangement.account.model.TransactionType;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.type.ErrorCode;
-import zb.accountMangement.member.domain.Member;
+import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.service.MemberService;
 
 import java.util.List;

@@ -11,10 +11,10 @@ import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.service.RedisService;
 import zb.accountMangement.common.type.ErrorCode;
-import zb.accountMangement.member.domain.Member;
+import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.repository.MemberRepository;
-import zb.accountMangement.member.type.RoleType;
+import zb.accountMangement.member.model.RoleType;
 
 import java.time.LocalDateTime;
 

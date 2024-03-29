@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.common.util.ValidationService;
-import zb.accountMangement.member.domain.Member;
+import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.service.MemberService;
 

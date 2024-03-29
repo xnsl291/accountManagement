@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.type.ErrorCode;
-import zb.accountMangement.member.domain.Member;
+import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.repository.MemberRepository;
-import zb.accountMangement.member.type.RoleType;
+import zb.accountMangement.member.model.RoleType;
 
 import java.time.LocalDateTime;
 
