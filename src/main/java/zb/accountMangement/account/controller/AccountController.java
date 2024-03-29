@@ -8,7 +8,7 @@ import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.dto.SearchAccountDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtTokenProvider;
-import zb.accountMangement.common.util.ValidationService;
+import zb.accountMangement.common.service.ValidationService;
 
 import java.util.List;
 

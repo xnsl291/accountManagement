@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.common.auth.JwtToken;
-import zb.accountMangement.common.util.ValidationService;
+import zb.accountMangement.common.service.ValidationService;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.service.AuthenticationService;
 import zb.accountMangement.member.service.SendMessageService;
