@@ -3,7 +3,7 @@ package zb.accountMangement.member.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zb.accountMangement.common.error.exception.NotFoundUserException;
+import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.domain.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
@@ -26,7 +26,7 @@ public class MemberService {
 	 */
 	public Member getUserById(long userId) {
 		return memberRepository.findById(userId).orElseThrow(
-				() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
 	}
 
 	/**
@@ -37,7 +37,7 @@ public class MemberService {
 	 */
 	public Member getUserByPhoneNumber(String phoneNumber) {
 		return memberRepository.findByPhoneNumber(phoneNumber).orElseThrow(
-				() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class MemberService {
 	@Transactional
 	public String deleteUser(long userId) {
 		Member member = memberRepository.findById(userId).orElseThrow(
-				() -> new NotFoundUserException(ErrorCode.USER_NOT_EXIST));
+				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
 
 		member.setRole(RoleType.WITHDRAWN);
 		member.setDeletedAt(LocalDateTime.now());
