@@ -10,6 +10,7 @@ on:
 
 jobs:
   test:
+    if: ${{ contains(github.event.head_commit.message, '#code-review') }} || ${{ contains(github.event.head_commit.message, '#code_review') }}
     runs-on: ubuntu-latest
     steps:
       - uses: anc95/ChatGPT-CodeReview@main
@@ -18,3 +19,4 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.GPT_API_KEY }}
           LANGUAGE: Korean
           MODEL: gpt-3.5-turbo
+
