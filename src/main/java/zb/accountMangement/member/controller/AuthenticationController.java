@@ -21,22 +21,6 @@ public class AuthenticationController {
     private final SendMessageService sendMessageService;
     private final ValidationService validationService;
 
-
-
-  /**
-   * 회원탈퇴
-   * @param token - 토큰
-   * @param userId - id
-   * @return "회원탈퇴완료"
-   */
-    @DeleteMapping("/{user_id}")
-    public ResponseEntity<String> deleteUserInfo(
-            @RequestHeader(value = "Authorization") String token,
-            @PathVariable("user_id") @Min(1) Long userId){
-        validationService.validTokenNUserId(token,userId);
-        return ResponseEntity.ok().body(authenticationService.deleteUser(userId));
-    }
-
     /**
     * 핸드폰 인증 성공 여부
     * @param token - 토큰

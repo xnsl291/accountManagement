@@ -107,13 +107,13 @@ public class MemberService {
 	 * 회원탈퇴
 	 */
 	@Transactional
-	public String deleteUser(long userId) {
+	public Boolean deleteUser(long userId) {
 		Member member = memberRepository.findById(userId).orElseThrow(
 				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
 
 		member.setRole(RoleType.WITHDRAWN);
 		member.setDeletedAt(LocalDateTime.now());
-		return "회원탈퇴완료";
+		return true;
 	}
 
 	/**
