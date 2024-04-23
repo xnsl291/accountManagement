@@ -21,19 +21,7 @@ public class AuthenticationController {
     private final SendMessageService sendMessageService;
     private final ValidationService validationService;
 
-    /**
-    * 회원가입
-    * @param token - 토큰
-    * @param signUpDto - 회원가입 dto (이름, 핸드폰번호, 로그인 PW, 초기계좌 PW)
-    * @return 성공여부
-    */
-    @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(
-            @RequestHeader(value = "Authorization") String token,
-            @Valid @RequestBody SignUpDto signUpDto){
-        authenticationService.signUp(token, signUpDto);
-        return ResponseEntity.ok().body("회원가입 성공");
-    }
+
 
   /**
    * 회원탈퇴

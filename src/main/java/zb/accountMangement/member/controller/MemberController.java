@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.common.service.ValidationService;
+import zb.accountMangement.member.dto.SignUpDto;
 import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.service.MemberService;
@@ -48,5 +49,18 @@ public class MemberController {
       @RequestBody @Valid UpdateUserDto updateUserDto){
     validationService.validTokenNUserId(token,userId);
     return ResponseEntity.ok().body(memberService.updateUserInfo(userId, updateUserDto));
+  }
+
+  /**
+   * 회원가입
+   * @param token - 토큰
+   * @param signUpDto - 회원가입 dto (이름, 핸드폰번호, 로그인 PW, 초기계좌 PW)
+   * @return "회원가입 성공"
+   */
+  @PostMapping("/sign-up")
+  public ResponseEntity<Boolean> signUp(
+          @RequestHeader(value = "Authorization") String token,
+          @Valid @RequestBody SignUpDto signUpDto){
+    return ResponseEntity.ok().body(memberService.signUp(token, signUpDto));
   }
 }

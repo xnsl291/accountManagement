@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.service.AccountService;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
@@ -30,45 +29,7 @@ public class AuthenticationService {
 	private final AccountService accountService;
 	private final RedisService redisService;
 
-	/**
-	 * 회원가입
-	 * @param token     - 토큰
-	 * @param signUpDto - 회원가입 dto (이름, 핸드폰번호, 로그인 PW, 초기계좌 PW)
-	 */
-	@Transactional
-	public void signUp(String token, SignUpDto signUpDto) {
-		String phoneNumber = convert2NumericString(signUpDto.getPhoneNumber());
 
-		// 이름 유효성 검사
-		if (!signUpDto.getName().matches("[가-힣a-zA-Z0-9]{2,10}")) {
-			throw new CustomException(ErrorCode.INVALID_NAME_FORMAT);
-		}
-
-		// 핸드폰번호 중복 검사
-		memberRepository.findByPhoneNumber(phoneNumber)
-				.ifPresent(m -> {
-					throw new CustomException(ErrorCode.DUPLICATED_PHONE_NUMBER);
-				});
-
-		// 핸드폰 인증번호 발송
-		sendMessageService.sendVerificationMessage(token, phoneNumber);
-
-		// 저장
-		Member member = Member.builder()
-				.name(signUpDto.getName())
-				.password(passwordEncoder.encode(signUpDto.getPassword()))
-				.phoneNumber(phoneNumber)
-				.build();
-
-		// 초기 계좌 생성
-		AccountManagementDto accountManagementDto = AccountManagementDto.builder()
-				.nickname(null)
-				.password(passwordEncoder.encode(signUpDto.getInitialAccountPassword()))
-				.build();
-
-		accountService.openAccount(member.getId(), accountManagementDto);
-		memberRepository.save(member);
-	}
 
 	/**
 	 * 회원탈퇴
