@@ -1,23 +1,18 @@
 package zb.accountMangement.member.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import zb.accountMangement.account.service.AccountService;
-import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.service.RedisService;
 import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.*;
-import zb.accountMangement.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthenticationService {
-	private final JwtTokenProvider jwtTokenProvider;
 	private final SendMessageService sendMessageService;
 	private final MemberService memberService;
 	private final RedisService redisService;
@@ -68,35 +63,5 @@ public class AuthenticationService {
 			throw new CustomException(ErrorCode.UNMATCHED_VERIFICATION_CODE);
 
 		return "비밀번호 재설정 완료";
-	}
-
-	/**
-	 * 로그아웃
-	 *
-	 * @param token - 토큰
-	 * @return "로그아웃 완료"
-	 */
-	public String signOut(String token) {
-
-		if (jwtTokenProvider.validateToken(token)) {
-			String phoneNumber = jwtTokenProvider.getPhoneNumber(token);
-
-			if (redisService.getData(phoneNumber) != null) {
-				redisService.deleteData(phoneNumber);
-			}
-			jwtTokenProvider.deleteToken(phoneNumber);
-		}
-		return "로그아웃 완료";
-	}
-
-	/**
-	 * 문자와 숫자가 혼용된 문자열에서 숫자만 추출
-	 *
-	 * @param string - 변환하고자 하는 문자열
-	 * @return 변환된 문자열
-	 */
-	public String convert2NumericString(String string) {
-		String pattern = "[^0-9]";
-		return string.replaceAll(pattern, "");
 	}
 }

@@ -65,14 +65,4 @@ public class AuthenticationController {
         validationService.validTokenNUserId(token,userId);
         return ResponseEntity.ok().body(authenticationService.verifyResetPw(token,userId,resetPwDto));
     }
-
-    /**
-    * 로그아웃
-    * @param token - 토큰
-    * @return "로그아웃 완료"
-    */
-    @PostMapping("/logout")
-    public ResponseEntity<String> signOut(@RequestHeader(value = "Authorization") String token){
-        return ResponseEntity.ok().body(authenticationService.signOut(token));
-    }
 }

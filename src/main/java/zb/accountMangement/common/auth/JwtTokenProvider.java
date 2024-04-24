@@ -61,10 +61,11 @@ public class JwtTokenProvider {
 		return new JwtToken(accessToken, refreshToken);
 	}
 
+	// todo : 로그아웃시, 블랙리스트 저장
 	public void deleteToken(String phoneNumber) {
 		String rtKey = "RT:" + phoneNumber;
 		if (redisService.getData(rtKey) != null)
-			redisService.deleteData(getPhoneNumber(rtKey));
+			redisService.deleteData(rtKey);
 	}
 
 	public boolean validateToken(String token) {

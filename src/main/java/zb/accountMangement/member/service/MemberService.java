@@ -138,6 +138,21 @@ public class MemberService {
 		return jwtTokenProvider.generateToken(member.getId(), member.getPhoneNumber(), member.getRole());
 	}
 
+	/**
+	 * 로그아웃
+	 *
+	 * @param token - 토큰
+	 * @return true
+	 */
+	public Boolean signOut(String token) {
+		boolean result = false;
+		if (jwtTokenProvider.validateToken(token)) {
+			String phoneNumber = jwtTokenProvider.getPhoneNumber(token);
+			jwtTokenProvider.deleteToken(phoneNumber);
+			result = true;
+		}
+		return result;
+	}
 
 	/**
 	 * 문자와 숫자가 혼용된 문자열에서 숫자만 추출

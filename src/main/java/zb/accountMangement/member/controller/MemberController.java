@@ -85,4 +85,14 @@ public class MemberController {
   public ResponseEntity<JwtToken> signIn(@Valid @RequestBody SignInDto signInDto){
     return ResponseEntity.ok().body(memberService.signIn(signInDto));
   }
+
+  /**
+   * 로그아웃
+   * @param token - 토큰
+   * @return true
+   */
+  @PostMapping("/logout")
+  public ResponseEntity<Boolean> signOut(@RequestHeader(value = "Authorization") String token){
+    return ResponseEntity.ok().body(memberService.signOut(token));
+  }
 }
