@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.service.ValidationService;
+import zb.accountMangement.member.dto.SignInDto;
 import zb.accountMangement.member.dto.SignUpDto;
 import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
@@ -72,5 +74,15 @@ public class MemberController {
           @PathVariable("user_id") @Min(1) Long userId){
     validationService.validTokenNUserId(token,userId);
     return ResponseEntity.ok().body(memberService.deleteUser(userId));
+  }
+
+  /**
+   * 로그인
+   * @param signInDto - 로그인 dto (핸드폰번호, 로그인 PW)
+   * @return token
+   */
+  @PostMapping("/login")
+  public ResponseEntity<JwtToken> signIn(@Valid @RequestBody SignInDto signInDto){
+    return ResponseEntity.ok().body(memberService.signIn(signInDto));
   }
 }

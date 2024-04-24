@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.service.ValidationService;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.service.AuthenticationService;
@@ -65,16 +64,6 @@ public class AuthenticationController {
             @Valid @RequestBody ResetPwDto resetPwDto) {
         validationService.validTokenNUserId(token,userId);
         return ResponseEntity.ok().body(authenticationService.verifyResetPw(token,userId,resetPwDto));
-    }
-
-    /**
-    * 로그인
-    * @param signInDto - 로그인 dto (핸드폰번호, 로그인 PW)
-    * @return token
-    */
-    @PostMapping("/login")
-    public ResponseEntity<JwtToken> signIn(@Valid @RequestBody SignInDto signInDto){
-        return ResponseEntity.ok().body(authenticationService.signIn(signInDto));
     }
 
     /**

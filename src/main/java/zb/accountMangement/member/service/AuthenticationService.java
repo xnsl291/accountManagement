@@ -5,7 +5,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.service.AccountService;
-import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.service.RedisService;
@@ -13,43 +12,20 @@ import zb.accountMangement.common.type.ErrorCode;
 import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.repository.MemberRepository;
-import zb.accountMangement.member.model.RoleType;
-
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthenticationService {
-	private final MemberRepository memberRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final SendMessageService sendMessageService;
-	private final BCryptPasswordEncoder passwordEncoder;
 	private final MemberService memberService;
-	private final AccountService accountService;
 	private final RedisService redisService;
-
-
-
-	/**
-	 * 회원탈퇴
-	 *
-	 * @param userId - id
-	 */
-	@Transactional
-	public String deleteUser(long userId) {
-		Member member = memberService.getUserById(userId);
-
-		member.setRole(RoleType.WITHDRAWN);
-		member.setDeletedAt(LocalDateTime.now());
-		return "회원탈퇴완료";
-	}
 
 	/**
 	 * 비밀번호 재설정 요청
 	 *
 	 * @param token           - 토큰
-	 * @param userId          - id
 	 * @param findUserInfoDto - 회원정보 조회 dto (이름, 핸드폰번호)
 	 * @return "인증 메세지 발송 완료"
 	 */
@@ -67,7 +43,6 @@ public class AuthenticationService {
 	/**
 	 * 비밀번호 재설정
 	 *
-	 * @param userId     - id
 	 * @param resetPwDto - 비밀번호 재설정 dto (인증번호, 새로운 PW)
 	 * @return "비밀번호 재설정 완료"
 	 */
@@ -96,35 +71,10 @@ public class AuthenticationService {
 	}
 
 	/**
-	 * 로그인 기능
-	 *
-	 * @param signInDto - 로그인 dto (핸드폰번호, 로그인 PW)
-	 * @return token - 토큰
-	 */
-	public JwtToken signIn(SignInDto signInDto) {
-		Member member = memberService.getUserByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()));
-
-		// 비밀번호 일치여부 확인
-		if (!passwordEncoder.matches(signInDto.getPassword(), member.getPassword()))
-			throw new CustomException(ErrorCode.UNMATCHED_PASSWORD);
-
-		if (member.getRole().equals(RoleType.WITHDRAWN))
-			throw new CustomException(ErrorCode.WITHDRAWN_USER);
-		if (member.getRole().equals(RoleType.PENDING))
-			throw new CustomException(ErrorCode.PENDING_USER);
-
-		String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), member.getPhoneNumber(), member.getRole());
-		String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(), member.getPhoneNumber(), member.getRole());
-
-		jwtTokenProvider.saveRefreshToken(member.getPhoneNumber(), refreshToken);
-		return new JwtToken(accessToken, refreshToken);
-	}
-
-	/**
 	 * 로그아웃
 	 *
 	 * @param token - 토큰
-	 *              return "로그아웃 완료"
+	 * @return "로그아웃 완료"
 	 */
 	public String signOut(String token) {
 

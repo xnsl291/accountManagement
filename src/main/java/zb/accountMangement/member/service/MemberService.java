@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import zb.accountMangement.account.dto.AccountManagementDto;
 import zb.accountMangement.account.service.AccountService;
+import zb.accountMangement.common.auth.JwtToken;
+import zb.accountMangement.common.auth.JwtTokenProvider;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.type.ErrorCode;
+import zb.accountMangement.member.dto.SignInDto;
 import zb.accountMangement.member.dto.SignUpDto;
 import zb.accountMangement.member.model.entity.Member;
 import zb.accountMangement.member.dto.UpdateUserDto;
@@ -24,6 +27,7 @@ public class MemberService {
 	private final SendMessageService sendMessageService;
 	private final BCryptPasswordEncoder passwordEncoder;
 	private final AccountService accountService;
+	private final JwtTokenProvider jwtTokenProvider;
 
 	/**
 	 * id를 이용한 회원 정보 열람
@@ -77,10 +81,8 @@ public class MemberService {
 		}
 
 		// 핸드폰번호 중복 검사
-		memberRepository.findByPhoneNumber(phoneNumber)
-				.ifPresent(m -> {
-					throw new CustomException(ErrorCode.DUPLICATED_PHONE_NUMBER);
-				});
+		if (getUserByPhoneNumber(phoneNumber) != null)
+			throw new CustomException(ErrorCode.DUPLICATED_PHONE_NUMBER);
 
 		// 핸드폰 인증번호 발송
 		sendMessageService.sendVerificationMessage(token, phoneNumber);
@@ -108,13 +110,38 @@ public class MemberService {
 	 */
 	@Transactional
 	public Boolean deleteUser(long userId) {
-		Member member = memberRepository.findById(userId).orElseThrow(
-				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
+		Member member = getUserById(userId);
 
 		member.setRole(RoleType.WITHDRAWN);
 		member.setDeletedAt(LocalDateTime.now());
 		return true;
 	}
+
+	/**
+	 * 로그인 기능
+	 *
+	 * @param signInDto - 로그인 dto (핸드폰번호, 로그인 PW)
+	 * @return token - 토큰
+	 */
+	public JwtToken signIn(SignInDto signInDto) {
+		Member member = getUserByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()));
+
+		// 비밀번호 일치여부 확인
+		if (!passwordEncoder.matches(signInDto.getPassword(), member.getPassword()))
+			throw new CustomException(ErrorCode.UNMATCHED_PASSWORD);
+
+		if (member.getRole().equals(RoleType.WITHDRAWN))
+			throw new CustomException(ErrorCode.WITHDRAWN_USER);
+		if (member.getRole().equals(RoleType.PENDING))
+			throw new CustomException(ErrorCode.PENDING_USER);
+
+		String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), member.getPhoneNumber(), member.getRole());
+		String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(), member.getPhoneNumber(), member.getRole());
+
+		jwtTokenProvider.saveRefreshToken(member.getPhoneNumber(), refreshToken);
+		return new JwtToken(accessToken, refreshToken);
+	}
+
 
 	/**
 	 * 문자와 숫자가 혼용된 문자열에서 숫자만 추출
