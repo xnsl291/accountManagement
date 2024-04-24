@@ -29,40 +29,36 @@ public class JwtTokenProvider {
 	private static final String AUTHORIZATION_PREFIX = "Bearer ";
 	private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 	private final RedisService redisService;
-	@Value("${jwt.secret}")
-	private String secret;
 	@Value("${jwt.expiration.access-token-seconds}")
 	private Long accessTokenExpirationTimeInSeconds;
 	@Value("${jwt.expiration.refresh-token-seconds}")
 	private Long refreshTokenExpirationTimeInSeconds;
 
-	public String generateAccessToken(Long id, String phoneNumber, RoleType authority) {
-		return generateToken(id, phoneNumber, authority.toString(), accessTokenExpirationTimeInSeconds);
-	}
-
-	public String generateRefreshToken(Long id, String phoneNumber, RoleType authority) {
-		return generateToken(id, phoneNumber, authority.toString(), refreshTokenExpirationTimeInSeconds);
-	}
-
-	public String generateToken(Long id, String phoneNumber, String authority, Long expirationTimeInSeconds) {
-		Date expiration = new Date(System.currentTimeMillis() + expirationTimeInSeconds);
-
+	public JwtToken generateToken(Long id, String phoneNumber, RoleType authority) {
 		Map<String, Object> claims = new HashMap<>();
-		claims.put("phoneNumber", phoneNumber);
 		claims.put("authority", authority);
-		claims.put("id", id.toString());
 
-		return Jwts.builder()
+		String accessToken = Jwts.builder()
+				.setSubject(phoneNumber)
+				.setId(id.toString())
+				.setClaims(claims)
+				.setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + accessTokenExpirationTimeInSeconds))
+				.signWith(secretKey, SignatureAlgorithm.HS256)
+				.compact();
+
+		String refreshToken = Jwts.builder()
 				.setSubject(phoneNumber)
 				.setClaims(claims)
 				.setIssuedAt(new Date())
-				.setExpiration(expiration)
+				.setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpirationTimeInSeconds))
 				.signWith(secretKey, SignatureAlgorithm.HS256)
 				.compact();
-	}
 
-	public void saveRefreshToken(String phoneNumber, String token) {
-		redisService.setData("RT:" + phoneNumber, token, refreshTokenExpirationTimeInSeconds);
+		//save refresh token
+		redisService.setData("RT:" + phoneNumber, refreshToken, refreshTokenExpirationTimeInSeconds);
+
+		return new JwtToken(accessToken, refreshToken);
 	}
 
 	public void deleteToken(String phoneNumber) {

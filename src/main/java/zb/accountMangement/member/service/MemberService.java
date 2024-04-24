@@ -135,11 +135,7 @@ public class MemberService {
 		if (member.getRole().equals(RoleType.PENDING))
 			throw new CustomException(ErrorCode.PENDING_USER);
 
-		String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), member.getPhoneNumber(), member.getRole());
-		String refreshToken = jwtTokenProvider.generateRefreshToken(member.getId(), member.getPhoneNumber(), member.getRole());
-
-		jwtTokenProvider.saveRefreshToken(member.getPhoneNumber(), refreshToken);
-		return new JwtToken(accessToken, refreshToken);
+		return jwtTokenProvider.generateToken(member.getId(), member.getPhoneNumber(), member.getRole());
 	}
 
 
