@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 @Transactional(readOnly = true)
 public class MemberService {
 	private final MemberRepository memberRepository;
-	private final SendMessageService sendMessageService;
 	private final BCryptPasswordEncoder passwordEncoder;
 	private final AccountService accountService;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -68,11 +67,9 @@ public class MemberService {
 
 	/**
 	 * 회원 가입
-	 *
-	 * @param token     - 토큰
 	 * @param signUpDto - 회원 가입 dto (이름, 핸드폰 번호, 로그인 비밀번호, 초기 계좌 비밀번호)
 	 */
-	public Boolean signUp(String token, SignUpDto signUpDto) {
+	public Boolean signUp(SignUpDto signUpDto) {
 		String phoneNumber = convert2NumericString(signUpDto.getPhoneNumber());
 
 		// 이름 유효성 검사
@@ -84,14 +81,12 @@ public class MemberService {
 		if (getUserByPhoneNumber(phoneNumber) != null)
 			throw new CustomException(ErrorCode.DUPLICATED_PHONE_NUMBER);
 
-		// 핸드폰 인증번호 발송
-		sendMessageService.sendVerificationMessage(token, phoneNumber);
-
 		// 저장
 		Member member = Member.builder()
 				.name(signUpDto.getName())
-				.password(passwordEncoder.encode(signUpDto.getPassword()))
+				.password(passwordEncoder.encode(signUpDto.getLoginPassword()))
 				.phoneNumber(phoneNumber)
+				.role(RoleType.USER)
 				.build();
 
 		// 초기 계좌 생성

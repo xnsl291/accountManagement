@@ -14,18 +14,17 @@ class AuthenticationServiceTest {
   @InjectMocks
   private MemberService memberService;
 
-  private final String token = "TMPTOKEN";
   @Test
   void signUp() {
     SignUpDto dto = SignUpDto.builder()
         .name("test")
-        .password("password123")
+        .loginPassword("password123")
         .phoneNumber("1234567890")
         .build();
 
 //    String encodedPassword = "encodedPassword";
 //    when(passwordEncoder.encode(dto.getPassword())).thenReturn(encodedPassword);
-    memberService.signUp(token,dto);
+    memberService.signUp(dto);
 
 //    verify(memberRepository).save(any(Member.class));
   }
