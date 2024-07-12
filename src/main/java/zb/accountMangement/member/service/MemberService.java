@@ -109,9 +109,8 @@ public class MemberService {
 	 * 회원탈퇴
 	 */
 	@Transactional
-	public Boolean deleteUser(long userId) {
-		Member member = getUserById(userId);
-
+	public Boolean deleteUser(String token) {
+		Member member = getUserById(jwtTokenProvider.getId(token));
 		member.setRole(RoleType.WITHDRAWN);
 		member.setDeletedAt(LocalDateTime.now());
 		return true;

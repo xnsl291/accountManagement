@@ -68,12 +68,10 @@ public class MemberController {
    * 회원탈퇴
    * @return true
    */
-  @DeleteMapping("/{user_id}")
+  @DeleteMapping("/sign-out")
   public ResponseEntity<Boolean> deleteUserInfo(
-          @RequestHeader(value = "Authorization") String token,
-          @PathVariable("user_id") @Min(1) Long userId){
-    validationService.validTokenNUserId(token,userId);
-    return ResponseEntity.ok().body(memberService.deleteUser(userId));
+          @RequestHeader(value = "Authorization") String token){
+    return ResponseEntity.ok().body(memberService.deleteUser(token));
   }
 
   /**
