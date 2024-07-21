@@ -25,13 +25,7 @@ public class AuthenticationService {
 	 * @return "인증 메세지 발송 완료"
 	 */
 	public String requestResetPw(String token, Long userId, FindUserInfoDto findUserInfoDto) {
-		Member member = memberService.getUserById(userId);
-		Member dtoMember = memberService.getUserByPhoneNumber(findUserInfoDto.getPhoneNumber());
-
-		if (!member.getId().equals(dtoMember.getId())) {
-			throw new CustomException(ErrorCode.UNMATCHED_USER);
-		}
-
+		memberService.checkMemberPermission(token, userId);
 		return sendMessageService.sendVerificationMessage(token, findUserInfoDto.getPhoneNumber());
 	}
 
@@ -44,14 +38,13 @@ public class AuthenticationService {
 	@Transactional
 	public String verifyResetPw(String token, Long userId, ResetPwDto resetPwDto) {
 		Member member = memberService.getUserById(userId);
-
 		SmsVerificationDto info = redisService.getMsgVerificationInfo(token);
+
 		if (info == null)
 			throw new CustomException(ErrorCode.USER_NOT_EXIST);
 
 		if (!member.getPhoneNumber().equals(info.getPhoneNumber()))
 			throw new CustomException(ErrorCode.UNMATCHED_USER);
-
 
 		// 핸드폰 인증 번호가 같으면
 		if (info.getVerificationCode().equals(resetPwDto.getInputCode())) {
