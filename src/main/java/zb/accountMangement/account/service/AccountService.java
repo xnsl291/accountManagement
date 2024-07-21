@@ -16,7 +16,7 @@ import zb.accountMangement.account.repository.AccountRepository;
 import zb.accountMangement.account.model.AccountStatus;
 import zb.accountMangement.common.exception.CustomException;
 import zb.accountMangement.common.type.ErrorCode;
-import zb.accountMangement.member.service.MemberService;
+import zb.accountMangement.member.repository.MemberRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,7 @@ public class AccountService {
     private final int ACCOUNT_NUMBER_LENGTH = 14;
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final MemberService memberService;
+    private final MemberRepository memberRepository;
     /**
      * 계좌번호 생성
      * @return 계좌번호
@@ -151,9 +151,11 @@ public class AccountService {
      */
     public SearchAccountDto searchAccount(Long accountId, Long requesterId) {
         Account account = getAccountById(accountId);
-        String username = memberService.getUserById(account.getUserId()).getName();
+        String username = memberRepository.findById(account.getUserId())
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_EXIST))
+                .getName();
 
-        // 본인의 계좌
+        // 본인 계좌
         if (account.getUserId().equals(requesterId)) {
             return SearchAccountDto.builder()
                     .accountId(account.getId())

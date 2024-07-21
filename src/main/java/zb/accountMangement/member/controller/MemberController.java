@@ -48,7 +48,7 @@ public class MemberController {
       @PathVariable("user_id") @Min(1) long userId,
       @RequestBody @Valid UpdateUserDto updateUserDto){
     validationService.validTokenNUserId(token,userId);
-    return ResponseEntity.ok().body(memberService.updateUserInfo(userId, updateUserDto));
+    return ResponseEntity.ok().body(memberService.updateUserInfo(token, userId, updateUserDto));
   }
 
   /**

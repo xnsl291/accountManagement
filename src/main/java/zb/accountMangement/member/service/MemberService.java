@@ -17,8 +17,6 @@ import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.repository.MemberRepository;
 import zb.accountMangement.member.model.RoleType;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -57,11 +55,9 @@ public class MemberService {
 	 * @return Member
 	 */
 	@Transactional
-	public Member updateUserInfo(long userId, UpdateUserDto updateUserDto) {
-		Member member = getUserById(userId);
-		member.setName(updateUserDto.getName());
-		member.setPassword(updateUserDto.getPassword());
-		member.setPhoneNumber(updateUserDto.getPhoneNumber());
+	public Member updateUserInfo(String token, long userId, UpdateUserDto updateUserDto) {
+		Member member = checkMemberPermission(token, userId);
+		member.update(updateUserDto);
 		return member;
 	}
 
@@ -105,9 +101,8 @@ public class MemberService {
 	 */
 	@Transactional
 	public Boolean deleteUser(String token) {
-		Member member = getUserById(jwtTokenProvider.getId(token));
-		member.setRole(RoleType.WITHDRAWN);
-		member.setDeletedAt(LocalDateTime.now());
+		Member member = checkMemberPermission(token, jwtTokenProvider.getId(token));
+		member.delete();
 		return true;
 	}
 
@@ -123,11 +118,6 @@ public class MemberService {
 		// 비밀번호 일치여부 확인
 		if (!passwordEncoder.matches(signInDto.getPassword(), member.getPassword()))
 			throw new CustomException(ErrorCode.UNMATCHED_PASSWORD);
-
-		if (member.getRole().equals(RoleType.WITHDRAWN))
-			throw new CustomException(ErrorCode.WITHDRAWN_USER);
-		if (member.getRole().equals(RoleType.PENDING))
-			throw new CustomException(ErrorCode.PENDING_USER);
 
 		return jwtTokenProvider.generateToken(member.getId(), member.getPhoneNumber(), member.getRole());
 	}
@@ -157,5 +147,24 @@ public class MemberService {
 	private String convert2NumericString(String string) {
 		String pattern = "[^0-9]";
 		return string.replaceAll(pattern, "");
+	}
+
+	private boolean isMemberTokenMatch(String token, Member member){
+		return jwtTokenProvider.getId(token).equals(member.getId());
+	}
+
+	private Member checkMemberPermission(String token, long memberId){
+		Member member = getUserById(memberId);
+
+		if(!isMemberTokenMatch(token, member))
+			throw new CustomException(ErrorCode.UNMATCHED_USER);
+
+		if (member.getRole().equals(RoleType.WITHDRAWN))
+			throw new CustomException(ErrorCode.WITHDRAWN_USER);
+
+		if (member.getRole().equals(RoleType.PENDING))
+			throw new CustomException(ErrorCode.PENDING_USER);
+
+		return member;
 	}
 }
