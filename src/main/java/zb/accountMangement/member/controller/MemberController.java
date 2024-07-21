@@ -6,10 +6,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import zb.accountMangement.common.auth.JwtToken;
 import zb.accountMangement.common.service.ValidationService;
-import zb.accountMangement.member.dto.SignInDto;
-import zb.accountMangement.member.dto.SignUpDto;
+import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.model.entity.Member;
-import zb.accountMangement.member.dto.UpdateUserDto;
 import zb.accountMangement.member.service.MemberService;
 
 import javax.validation.Valid;
@@ -51,44 +49,37 @@ public class MemberController {
     return ResponseEntity.ok().body(memberService.updateUserInfo(token, userId, updateUserDto));
   }
 
-  /**
-   * 회원가입
-   * @param signUpDto - 회원가입 dto (이름, 핸드폰번호, 로그인 PW, 초기계좌 PW)
-   * @return true
-   */
-  @PostMapping("/sign-up")
-  public ResponseEntity<Boolean> signUp(
-          @Valid @RequestBody SignUpDto signUpDto){
-    return ResponseEntity.ok().body(memberService.signUp(signUpDto));
-  }
+
 
   /**
-   * 회원탈퇴
-   * @return true
-   */
-  @DeleteMapping("/sign-out")
-  public ResponseEntity<Boolean> deleteUserInfo(
-          @RequestHeader(value = "Authorization") String token){
-    return ResponseEntity.ok().body(memberService.deleteUser(token));
-  }
-
-  /**
-   * 로그인
-   * @param signInDto - 로그인 dto (핸드폰번호, 로그인 PW)
-   * @return token
-   */
-  @PostMapping("/login")
-  public ResponseEntity<JwtToken> signIn(@Valid @RequestBody SignInDto signInDto){
-    return ResponseEntity.ok().body(memberService.signIn(signInDto));
-  }
-
-  /**
-   * 로그아웃
+   * 비밀번호 재설정 요청
    * @param token - 토큰
-   * @return true
+   * @param userId  사용자 ID
+   * @param findUserInfoDto - 회원정보 조회 dto (이름, 핸드폰번호)
+   * @return "인증 메세지 발송 완료"
    */
-  @PostMapping("/logout")
-  public ResponseEntity<Boolean> signOut(@RequestHeader(value = "Authorization") String token){
-    return ResponseEntity.ok().body(memberService.signOut(token));
+  @PostMapping("/find-pw/{user_id}")
+  public ResponseEntity<String> requestResetPw(
+          @RequestHeader(value = "Authorization") String token,
+          @PathVariable("user_id") @Min(1) Long userId,
+          @Valid @RequestBody FindUserInfoDto findUserInfoDto) {
+    validationService.validTokenNUserId(token,userId);
+    return ResponseEntity.ok().body(memberService.requestResetPw(token,userId,findUserInfoDto));
+  }
+
+  /**
+   * 비밀번호 재설정
+   * @param token - 토큰
+   * @param userId - 사용자 ID
+   * @param resetPwDto - 비밀번호 재설정 dto (인증번호, 새로운 PW)
+   * @return "비밀번호 재설정 완료"
+   */
+  @PatchMapping("/find-pw/{user_id}/confirm")
+  public ResponseEntity<String> verifyResetPw(
+          @RequestHeader(value = "Authorization") String token,
+          @PathVariable("user_id") @Min(1) Long userId,
+          @Valid @RequestBody ResetPwDto resetPwDto) {
+    validationService.validTokenNUserId(token,userId);
+    return ResponseEntity.ok().body(memberService.verifyResetPw(token,userId,resetPwDto));
   }
 }

@@ -9,10 +9,10 @@ import zb.accountMangement.member.repository.MemberRepository;
 
 @SpringBootTest
 class AuthenticationServiceTest {
-  @Mock
-  private MemberRepository memberRepository;
+//  @Mock
+//  private MemberRepository memberRepository;
   @InjectMocks
-  private MemberService memberService;
+  private AuthenticationService authService;
 
   @Test
   void signUp() {
@@ -24,7 +24,7 @@ class AuthenticationServiceTest {
 
 //    String encodedPassword = "encodedPassword";
 //    when(passwordEncoder.encode(dto.getPassword())).thenReturn(encodedPassword);
-    memberService.signUp(dto);
+    authService.signUp(dto);
 
 //    verify(memberRepository).save(any(Member.class));
   }
