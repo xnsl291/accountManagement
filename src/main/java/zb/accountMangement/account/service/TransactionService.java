@@ -33,7 +33,7 @@ public class TransactionService {
 	public String validateRecipient(String accountNumber) {
 		Account account = accountService.getAccountByNumber(accountNumber);
 		if (!account.isDeletedAccount())
-			return memberService.getUserById(account.getUserId()).getName();
+			return memberService.getMemberById(account.getMemberId()).getName();
 		throw new CustomException(ErrorCode.DELETED_ACCOUNT);
 	}
 
@@ -100,8 +100,8 @@ public class TransactionService {
 		Account senderAccount = accountService.getAccountById(senderAccountId);
 		Account recipientAccount = accountService.getAccountById(receiverAccountId);
 
-		Member sender = memberService.getUserById(senderAccount.getUserId());
-		Member receiver = memberService.getUserById(recipientAccount.getUserId());
+		Member sender = memberService.getMemberById(senderAccount.getMemberId());
+		Member receiver = memberService.getMemberById(recipientAccount.getMemberId());
 
 		double recentSenderBalance = senderAccount.getBalance() - transferDto.getAmount();
 		double recentRecipientBalance = recipientAccount.getBalance() + transferDto.getAmount();

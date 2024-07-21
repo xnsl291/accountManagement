@@ -17,7 +17,7 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import zb.accountMangement.member.dto.UpdateUserDto;
+import zb.accountMangement.member.dto.UpdateMemberDto;
 import zb.accountMangement.member.model.RoleType;
 
 @Entity
@@ -52,7 +52,7 @@ public class Member {
   private LocalDateTime deletedAt;
 
 
-  public void update(UpdateUserDto requestDto) {
+  public void update(UpdateMemberDto requestDto) {
     this.name = requestDto.getName();
     this.password = requestDto.getPassword();
     this.phoneNumber = requestDto.getPhoneNumber();

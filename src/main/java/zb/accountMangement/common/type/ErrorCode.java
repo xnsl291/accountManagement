@@ -15,12 +15,12 @@ public enum ErrorCode {
 
     // user
     INVALID_NAME_FORMAT(HttpStatus.BAD_REQUEST,"입력값의 형식이 올바르지 않습니다."),
-    USER_NOT_EXIST(HttpStatus.NOT_FOUND,"해당 사용자가 존재하지 않습니다."),
-    WITHDRAWN_USER(HttpStatus.NOT_FOUND,"탈퇴한 사용자입니다."),
-    PENDING_USER(HttpStatus.NOT_FOUND,"사용이 정지된 계정입니다."),
+    MEMBER_NOT_EXIST(HttpStatus.NOT_FOUND,"해당 사용자가 존재하지 않습니다."),
+    WITHDRAWN_MEMBER(HttpStatus.NOT_FOUND,"탈퇴한 사용자입니다."),
+    PENDING_MEMBER(HttpStatus.NOT_FOUND,"사용이 정지된 계정입니다."),
     DUPLICATED_PHONE_NUMBER(HttpStatus.BAD_REQUEST,"이미 등록된 핸드폰 번호입니다."),
 
-    UNMATCHED_USER(HttpStatus.BAD_REQUEST,"사용자 정보가 일치하지 않습니다."),
+    UNMATCHED_MEMBER(HttpStatus.BAD_REQUEST,"사용자 정보가 일치하지 않습니다."),
     UNMATCHED_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다."),
     UNMATCHED_VERIFICATION_CODE(HttpStatus.BAD_REQUEST,"인증 코드가 일치하지 않습니다."),
     MISMATCHED_USER_ID(HttpStatus.BAD_REQUEST,"토큰정보와 사용자의 정보가 일치하지 않습니다"),

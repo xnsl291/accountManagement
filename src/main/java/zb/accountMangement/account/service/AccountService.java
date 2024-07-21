@@ -57,12 +57,12 @@ public class AccountService {
 
     /**
      * 계좌 개설
-     * @param userId - 사용자 ID
+     * @param memberId - 사용자 ID
      * @param accountManagementDto - 계좌 정보 dto (계좌별명, 계좌 PW)
      * @return Account
      */
     @Transactional
-    public Account openAccount(Long userId, AccountManagementDto accountManagementDto) {
+    public Account openAccount(Long memberId, AccountManagementDto accountManagementDto) {
         // 계좌번호 랜덤생성 - 중복 생성 x
         String accountNumber = createAccountNumber();
 
@@ -72,7 +72,7 @@ public class AccountService {
 
         Account account = Account.builder()
               .accountNumber(accountNumber)
-              .userId(userId)
+              .memberId(memberId)
               .nickname(accountManagementDto.getNickname())
               .password(passwordEncoder.encode(accountManagementDto.getPassword()))
               .status(AccountStatus.EXISTS)
@@ -126,10 +126,10 @@ public class AccountService {
         boolean result = false;
         Account account = getAccountById(accountId);
 
-        List<Account> userAccounts = getAllAccounts(account.getUserId());
+        List<Account> memberAccounts = getAllAccounts(account.getMemberId());
 
         // 사용자가 2개 이상의 계좌를 가지고 있어야 삭제 가능
-        if( account.isExistsAccount() && userAccounts.size() >= 2 ) {
+        if( account.isExistsAccount() && memberAccounts.size() >= 2 ) {
             account.setStatus(AccountStatus.DELETED);
             account.setDeletedAt(LocalDateTime.now());
             result = true;
@@ -139,8 +139,8 @@ public class AccountService {
     }
 
     // 전체 계좌 조회
-    public List<Account> getAllAccounts(Long userId){
-        return accountRepository.findByUserId(userId);
+    public List<Account> getAllAccounts(Long memberId){
+        return accountRepository.findByMemberId(memberId);
     }
 
     /**
@@ -151,12 +151,12 @@ public class AccountService {
      */
     public SearchAccountDto searchAccount(Long accountId, Long requesterId) {
         Account account = getAccountById(accountId);
-        String username = memberRepository.findById(account.getUserId())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_EXIST))
+        String username = memberRepository.findById(account.getMemberId())
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXIST))
                 .getName();
 
         // 본인 계좌
-        if (account.getUserId().equals(requesterId)) {
+        if (account.getMemberId().equals(requesterId)) {
             return SearchAccountDto.builder()
                     .accountId(account.getId())
                     .accountNumber(account.getAccountNumber())

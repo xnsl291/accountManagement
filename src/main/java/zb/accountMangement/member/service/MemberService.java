@@ -24,12 +24,12 @@ public class MemberService {
 	/**
 	 * id를 이용한 회원 정보 열람
 	 *
-	 * @param userId - id
+	 * @param memberId - id
 	 * @return Member
 	 */
-	public Member getUserById(long userId) {
-		return memberRepository.findById(userId).orElseThrow(
-				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
+	public Member getMemberById(long memberId) {
+		return memberRepository.findById(memberId).orElseThrow(
+				() -> new CustomException(ErrorCode.MEMBER_NOT_EXIST));
 	}
 
 
@@ -37,13 +37,13 @@ public class MemberService {
 	/**
 	 * 회원 정보 수정
 	 *
-	 * @param updateUserDto - 사용자 정보수정 dto (이름, 핸드폰번호, 로그인 비밀번호)
+	 * @param updateMemberDto - 사용자 정보수정 dto (이름, 핸드폰번호, 로그인 비밀번호)
 	 * @return Member
 	 */
 	@Transactional
-	public Member updateUserInfo(String token, long userId, UpdateUserDto updateUserDto) {
-		Member member = checkMemberPermission(token, userId);
-		member.update(updateUserDto);
+	public Member updateMemberInfo(String token, long memberId, UpdateMemberDto updateMemberDto) {
+		Member member = checkMemberPermission(token, memberId);
+		member.update(updateMemberDto);
 		return member;
 	}
 
@@ -51,12 +51,12 @@ public class MemberService {
 	 * 비밀번호 재설정 요청
 	 *
 	 * @param token           - 토큰
-	 * @param findUserInfoDto - 회원정보 조회 dto (이름, 핸드폰번호)
+	 * @param findMemberInfoDto - 회원정보 조회 dto (이름, 핸드폰번호)
 	 * @return "인증 메세지 발송 완료"
 	 */
-	public String requestResetPw(String token, Long userId, FindUserInfoDto findUserInfoDto) {
-		checkMemberPermission(token, userId);
-		return sendMessageService.sendVerificationMessage(token, findUserInfoDto.getPhoneNumber());
+	public String requestResetPw(String token, Long memberId, FindMemberInfoDto findMemberInfoDto) {
+		checkMemberPermission(token, memberId);
+		return sendMessageService.sendVerificationMessage(token, findMemberInfoDto.getPhoneNumber());
 	}
 
 	/**
@@ -66,15 +66,15 @@ public class MemberService {
 	 * @return "비밀번호 재설정 완료"
 	 */
 	@Transactional
-	public String verifyResetPw(String token, Long userId, ResetPwDto resetPwDto) {
-		Member member = getUserById(userId);
+	public String verifyResetPw(String token, Long memberId, ResetPwDto resetPwDto) {
+		Member member = getMemberById(memberId);
 		SmsVerificationDto info = redisService.getMsgVerificationInfo(token);
 
 		if (info == null)
-			throw new CustomException(ErrorCode.USER_NOT_EXIST);
+			throw new CustomException(ErrorCode.MEMBER_NOT_EXIST);
 
 		if (!member.getPhoneNumber().equals(info.getPhoneNumber()))
-			throw new CustomException(ErrorCode.UNMATCHED_USER);
+			throw new CustomException(ErrorCode.UNMATCHED_MEMBER);
 
 		// 핸드폰 인증 번호가 같으면
 		if (info.getVerificationCode().equals(resetPwDto.getInputCode())) {
@@ -94,16 +94,16 @@ public class MemberService {
 	}
 
 	public Member checkMemberPermission(String token, long memberId){
-		Member member = getUserById(memberId);
+		Member member = getMemberById(memberId);
 
 		if(!isMemberTokenMatch(token, member))
-			throw new CustomException(ErrorCode.UNMATCHED_USER);
+			throw new CustomException(ErrorCode.UNMATCHED_MEMBER);
 
 		if (member.getRole().equals(RoleType.WITHDRAWN))
-			throw new CustomException(ErrorCode.WITHDRAWN_USER);
+			throw new CustomException(ErrorCode.WITHDRAWN_MEMBER);
 
 		if (member.getRole().equals(RoleType.PENDING))
-			throw new CustomException(ErrorCode.PENDING_USER);
+			throw new CustomException(ErrorCode.PENDING_MEMBER);
 
 		return member;
 	}
@@ -116,8 +116,8 @@ public class MemberService {
 	 * @param phoneNumber - 핸드폰번호
 	 * @return Member
 	 */
-	public Member getUserByPhoneNumber(String phoneNumber) {
+	public Member getMemberByPhoneNumber(String phoneNumber) {
 		return memberRepository.findByPhoneNumber(phoneNumber).orElseThrow(
-				() -> new CustomException(ErrorCode.USER_NOT_EXIST));
+				() -> new CustomException(ErrorCode.MEMBER_NOT_EXIST));
 	}
 }

@@ -10,7 +10,6 @@ import zb.accountMangement.member.dto.*;
 import zb.accountMangement.member.service.AuthenticationService;
 import zb.accountMangement.member.service.SendMessageService;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class AuthenticationController {
     public ResponseEntity<Boolean> verifySMS(
             @RequestHeader(value = "Authorization") String token,
             @Valid @RequestBody SmsVerificationDto smsVerificationDto) {
-        validationService.validTokenNUserPhoneNumber(token,smsVerificationDto.getPhoneNumber());
+        validationService.validTokenNMemberPhoneNumber(token,smsVerificationDto.getPhoneNumber());
         return ResponseEntity.ok().body(sendMessageService.verifyCode(token, smsVerificationDto));
     }
 
@@ -51,9 +50,9 @@ public class AuthenticationController {
      * @return true
      */
     @DeleteMapping("/sign-out")
-    public ResponseEntity<Boolean> deleteUserInfo(
+    public ResponseEntity<Boolean> deleteMemberInfo(
             @RequestHeader(value = "Authorization") String token){
-        return ResponseEntity.ok().body(authenticationService.deleteUser(token));
+        return ResponseEntity.ok().body(authenticationService.deleteMember(token));
     }
 
     /**

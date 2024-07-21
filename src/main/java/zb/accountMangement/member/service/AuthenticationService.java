@@ -39,7 +39,7 @@ public class AuthenticationService {
 		}
 
 		// 핸드폰번호 중복 검사
-		if (memberService.getUserByPhoneNumber(phoneNumber) != null)
+		if (memberService.getMemberByPhoneNumber(phoneNumber) != null)
 			throw new CustomException(ErrorCode.DUPLICATED_PHONE_NUMBER);
 
 		// 저장
@@ -65,7 +65,7 @@ public class AuthenticationService {
 	 * 회원탈퇴
 	 */
 	@Transactional
-	public Boolean deleteUser(String token) {
+	public Boolean deleteMember(String token) {
 		Member member = memberService.checkMemberPermission(token, jwtTokenProvider.getId(token));
 		member.delete();
 		return true;
@@ -78,7 +78,7 @@ public class AuthenticationService {
 	 * @return token - 토큰
 	 */
 	public JwtToken signIn(SignInDto signInDto) {
-		Member member = memberService.getUserByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()));
+		Member member = memberService.getMemberByPhoneNumber(convert2NumericString(signInDto.getPhoneNumber()));
 
 		// 비밀번호 일치여부 확인
 		if (!passwordEncoder.matches(signInDto.getPassword(), member.getPassword()))

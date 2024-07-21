@@ -80,15 +80,15 @@ public class AccountController {
   /**
    * 사용자가 소유한 전체계좌조회
    * @param token - 토큰
-   * @param userId - 사용자 ID
+   * @param memberId - 사용자 ID
    * @return 사용자가 소유한 계좌 리스트
    */
-  @GetMapping("/{user_id}")
+  @GetMapping("/{member_id}")
   public ResponseEntity<List<Account>> getAllAccounts(
           @RequestHeader(value = "Authorization") String token,
-          @PathVariable("user_id")Long userId){
-    validationService.validTokenNUserId(token,userId);
-    return ResponseEntity.ok().body(accountService.getAllAccounts(userId));
+          @PathVariable("member_id")Long memberId){
+    validationService.validTokenNMemberId(token,memberId);
+    return ResponseEntity.ok().body(accountService.getAllAccounts(memberId));
   }
 
   /**

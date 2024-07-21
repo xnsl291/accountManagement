@@ -20,18 +20,18 @@ public class ValidationService {
     public void validTokenNAccountOwner(String token, Long accountId){
         Account account = accountService.getAccountInfo(accountId);
         Long userId = tokenProvider.getId(token);
-        if (!account.getUserId().equals(userId))
+        if (!account.getMemberId().equals(userId))
             throw new CustomException(ErrorCode.MISMATCH_ACCOUNT_OWNER);
     }
-    public void validTokenNUserId(String token, Long userId){
+    public void validTokenNMemberId(String token, Long userId){
         Long tokenProviderId = tokenProvider.getId(token);
         if (!tokenProviderId.equals(userId))
             throw new CustomException(ErrorCode.MISMATCHED_USER_ID);
     }
 
-    public void validTokenNUserPhoneNumber(String token, String phoneNum){
+    public void validTokenNMemberPhoneNumber(String token, String phoneNum){
         Long userId = memberRepository.findByPhoneNumber(phoneNum)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_EXIST)).getId();
-        validTokenNUserId(token, userId);
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_EXIST)).getId();
+        validTokenNMemberId(token, userId);
     }
 }

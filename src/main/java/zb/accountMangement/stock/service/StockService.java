@@ -189,7 +189,7 @@ public class StockService {
         Account senderAccount = accountService.getAccountById(transferStockDto.getSenderAccountId());
 
         Long senderId = senderAccount.getId();
-        Long receiverId = accountService.getAccountById(transferStockDto.getReceiverAccountId()).getUserId();
+        Long receiverId = accountService.getAccountById(transferStockDto.getReceiverAccountId()).getMemberId();
 
         // 본인 계좌에 이체할 경우 수수료 X
         double transferFee = senderId.equals(receiverId) ?
